@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="A game of survival" />
+	<meta name="author" content="David Moritz" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- for Bootstrap -->
+	<title>Thrive</title>
+	<link rel="shortcut icon" href="favicon.ico">
+	<link rel="stylesheet" href="inc/thrive.css">
+	<script src="inc/angular.js"></script>
+</head>
+<body ng-app="survivalApp" ng-controller="SurvivalCtrl">
+	<div class='container'>
+		<header class='hide'>
+			<h1>Survival!</h1>
+		</header>
+		<div class='jumbotron'>
+			<h2>{{display.text}}</h2>
+			<button class="btn btn-default" ng-show="display.next" ng-click="nextMessage()">Next</button>
+			<div class="choices" ng-show="!display.next">
+			    <ul>
+			        <li ng-repeat="choice in display.choices">
+			            <button ng-click="makeChoice(choice.choose)" ng-class="choice.class">{{choice.text}}</button>
+			        </li>
+			    </ul>
+			</div>
+            
+		</div>
+		<div class='row mainLayout' ng-show="!choice">
+			<div class='col-sm-6'>
+				<div>
+				    <h3>Location: {{location}}</h3>
+					<h3>Add New Follower</h3>
+					<form id='addFollowerForm' ng-submit="addFollower()">
+						<input class='btn btn-primary' type='submit' value='Add'>
+					</form>
+				</div>
+				<div>
+					<h3>Add New Resource</h3>
+					<button ng-click="addToSupply('water',5,4000)" class="btn btn-primary" ng-disabled="!ready.water">Fetch Water</button>
+					<button ng-click="addToSupply('wood',2,8000)" class="btn btn-primary" ng-disabled="!ready.wood">Gather Wood</button>
+				</div>
+			</div>
+			<div class='col-sm-6'>
+				<h4>Followers</h4>
+				<ul>
+					<li ng-repeat="follower in allFollowers">
+					    <a href='#' class="followerSelected" ng-click="deselectFollower()" ng-if="selectedFollower == follower">{{follower.name}}: ({{follower.task.name}})</a>
+                        <a href='#' ng-click="selectFollower(follower)" ng-if="selectedFollower != follower">{{follower.name}}: ({{follower.task.name}})</a>
+						<a href='#' ng-click="removeFollower($index)"><span class="glyphicon glyphicon-remove-sign"></span></a>
+					</li>
+				</ul>
+				<h4>Supply</h4>
+				<ul>
+					<li ng-repeat="resource in supply">{{resource.type}}: ({{resource.quantity}})
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div ng-show="!gameStart">
+		    <button class="btn btn-primary" ng-click="startGame()">Start</button>
+		</div>
+		<footer class='clear'>
+			<br>&nbsp;
+			<br>&nbsp;
+			<br>&nbsp;
+			<p>Created by David Moritz</p>
+		</footer>
+	</div>
+	@@javascriptReplaceFiles
+</body>
+</html>
