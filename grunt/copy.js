@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 					dest: '<%= distRoot %>'
 				},
 
-				// copy all fontawesome fonts
+				// copy all bootstrap fonts
 				{
 					expand: true,
 					cwd: 'lib/bootstrap/fonts/',
@@ -76,10 +76,24 @@ module.exports = function(grunt) {
 					dest: '<%= distRoot %>/fonts/'
 				},
 
+				// copy all bootstrap fonts
+				{
+					expand: true,
+					cwd: 'lib/bootstrap/fonts/',
+					src: ['**'],
+					dest: '<%= distRoot %>/fonts/'
+				},
+
 				// copy Angular for head
 				{
 					src: 'lib/angular/angular.min.js',
 					dest: '<%= distPath %>angular.js'
+				},
+
+				// copy Angular for head
+				{
+					src: 'lib/angular/angular.min.js.map',
+					dest: '<%= distPath %>angular.min.js.map'
 				},
 
 				// copy all img files too
