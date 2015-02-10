@@ -11,7 +11,7 @@
 	<script src="inc/angular.js"></script>
 </head>
 <body ng-app="survivalApp" ng-controller="SurvivalCtrl">
-	<div class='container'>
+	<div class='container' ng-show="!unlocked.win">
 		<header class='hide'>
 			<h1>Survival!</h1>
 		</header>
@@ -25,21 +25,25 @@
 			        </li>
 			    </ul>
 			</div>
-            
 		</div>
 		<div class='row mainLayout' ng-show="!choice">
 			<div class='col-sm-6'>
 				<div>
 				    <h3>Location: {{location}}</h3>
-					<h3>Add New Follower</h3>
-					<form id='addFollowerForm' ng-submit="addFollower()">
-						<input class='btn btn-primary' type='submit' value='Add'>
-					</form>
 				</div>
 				<div>
 					<h3>Add New Resource</h3>
-					<button ng-click="addToSupply('water',5,4000)" class="btn btn-primary" ng-disabled="!ready.water">Fetch Water</button>
-					<button ng-click="addToSupply('wood',2,8000)" class="btn btn-primary" ng-disabled="!ready.wood">Gather Wood</button>
+					<button ng-click="addToSupply('water')" class="btn btn-primary" ng-disabled="!ready.water">Fetch Water</button>
+					<button ng-click="addToSupply('food')" class="btn btn-primary" ng-disabled="!ready.food" ng-show="unlocked.food">Gather Food</button>
+					<button ng-click="addToSupply('wood')" class="btn btn-primary" ng-disabled="!ready.wood" ng-show="unlocked.wood">Chop Wood</button>
+					<button ng-click="addToSupply('clay')" class="btn btn-primary" ng-disabled="!ready.clay" ng-show="unlocked.clay">Dig Clay</button>
+					<button ng-click="addToSupply('brick')" class="btn btn-primary" ng-disabled="!ready.brick" ng-show="unlocked.brick">Make Brick</button>
+				</div>
+				<div>
+					<h3>Build</h3>
+					<button ng-click="build('hut')" class="btn btn-success" ng-show="unlocked.hut">Build Hut</button>
+					<button ng-click="build('smelter')" class="btn btn-success" ng-show="unlocked.smelter">Build Smelter</button>
+					<button ng-click="build('monument')" class="btn btn-success" ng-show="unlocked.monument">Build Monument</button>
 				</div>
 			</div>
 			<div class='col-sm-6'>
@@ -48,12 +52,18 @@
 					<li ng-repeat="follower in allFollowers">
 					    <a href='#' class="followerSelected" ng-click="deselectFollower()" ng-if="selectedFollower == follower">{{follower.name}}: ({{follower.task.name}})</a>
                         <a href='#' ng-click="selectFollower(follower)" ng-if="selectedFollower != follower">{{follower.name}}: ({{follower.task.name}})</a>
-						<a href='#' ng-click="removeFollower($index)"><span class="glyphicon glyphicon-remove-sign"></span></a>
+						<a href='#' ng-click="removeFollower(follower)"><span class="glyphicon glyphicon-remove-sign"></span></a>
 					</li>
 				</ul>
 				<h4>Supply</h4>
 				<ul>
 					<li ng-repeat="resource in supply">{{resource.type}}: ({{resource.quantity}})
+					</li>
+				</ul>
+				<h4>Plot</h4>
+				<ul>
+					<li ng-repeat="lot in plot">{{lot.type}}: ({{lot.quantity}})
+						<a href='#' ng-click="removeStructure(lot.type)"><span class="glyphicon glyphicon-remove-sign"></span></a>
 					</li>
 				</ul>
 			</div>
@@ -67,6 +77,12 @@
 			<br>&nbsp;
 			<p>Created by David Moritz</p>
 		</footer>
+	</div>
+	<div ng-show="unlocked.win">
+		<div class="jumbotron">
+			<h1>Congratulations! You built a monument!</h1>
+			<h4>It only took you {{turns}} turns.</h4>
+		</div>
 	</div>
 	@@javascriptReplaceFiles
 </body>
