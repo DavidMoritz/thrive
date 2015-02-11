@@ -49,7 +49,9 @@ var survivalApp = angular.module("survivalApp", []);
 survivalApp.controller("SurvivalCtrl", function($scope) {
 	$s = $scope;
 	$s.allFollowers = [];
-	$s.unlocked = {};
+	$s.unlocked = {
+		water: true
+	};
 	$s.supply = [];
 	$s.turns = 0;
 	$s.plot = [];
@@ -288,30 +290,40 @@ survivalApp.controller("SurvivalCtrl", function($scope) {
 
 	$s.resourceTypes = {
 		water: {
+			name: "water",
+			text: "Fetch Water",
 			increase:5,
 			cooldown:4000,
 			cost: [{}],
 			unlock: "food"
 		},
 		wood: {
+			name: "wood",
+			text: "Chop Wood",
 			increase:2,
 			cooldown:1000,
 			cost: [{}],
 			unlock: "hut"
 		},
 		food: {
+			name: "food",
+			text: "Gather food",
 			increase:3,
 			cooldown:2000,
 			cost: [{}],
 			unlock: "wood"
 		},
 		clay: {
+			name: "clay",
+			text: "Dig Clay",
 			increase:2,
 			cooldown:2000,
 			cost: [{}],
 			unlock: "smelter"
 		},
 		brick: {
+			name: "brick",
+			text: "Make brick",
 			increase:1,
 			cooldown:2000,
 			cost: [{
@@ -327,6 +339,8 @@ survivalApp.controller("SurvivalCtrl", function($scope) {
 
 	$s.buildingTypes = {
 		hut: {
+			name: "hut",
+			text: "Build Hut",
 			size: 1,
 			cooldown: 2000,
 			capacity: 1,
@@ -337,6 +351,8 @@ survivalApp.controller("SurvivalCtrl", function($scope) {
 			unlock: "clay"
 		},
 		smelter: {
+			name: "smelter",
+			text: "Build Smelter",
 			size: 2,
 			cooldown: 2000,
 			capacity: 0,
@@ -347,6 +363,8 @@ survivalApp.controller("SurvivalCtrl", function($scope) {
 			unlock: "brick"
 		},
 		monument: {
+			name: "monument",
+			text: "Build Monument",
 			size: 10,
 			cooldown: 2000,
 			capacity: 0,

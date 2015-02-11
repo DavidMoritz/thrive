@@ -27,16 +27,10 @@ html
 						h3 Location: {{location}}
 					div
 						h3 Add New Resource
-						button.btn.btn-primary(ng-click="addToSupply('water')", ng-disabled='!ready.water') Fetch Water
-						button.btn.btn-primary(ng-click="addToSupply('food')", ng-disabled='!ready.food', ng-show='unlocked.food') Gather Food
-						button.btn.btn-primary(ng-click="addToSupply('wood')", ng-disabled='!ready.wood', ng-show='unlocked.wood') Chop Wood
-						button.btn.btn-primary(ng-click="addToSupply('clay')", ng-disabled='!ready.clay', ng-show='unlocked.clay') Dig Clay
-						button.btn.btn-primary(ng-click="addToSupply('brick')", ng-disabled='!ready.brick', ng-show='unlocked.brick') Make Brick
+						button.btn.btn-primary.resource(ng-repeat='resource in resourceTypes' ng-click="addToSupply(resource.name)", ng-disabled='!ready[resource.name]', ng-show='unlocked[resource.name]') {{resource.text}}
 					div
 						h3 Build
-						button.btn.btn-success(ng-click="build('hut')", ng-show='unlocked.hut') Build Hut
-						button.btn.btn-success(ng-click="build('smelter')", ng-show='unlocked.smelter') Build Smelter
-						button.btn.btn-success(ng-click="build('monument')", ng-show='unlocked.monument') Build Monument
+						button.btn.btn-success(ng-repeat='building in buildingTypes' ng-click="build(building.name)", ng-show='unlocked[building.name]') {{building.name}}
 				.col-sm-6
 					h4 Followers
 					ul
