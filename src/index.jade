@@ -10,7 +10,7 @@ html
 		link(rel='shortcut icon', href='favicon.ico')
 		link(rel='stylesheet', href='inc/thrive.css')
 		script(src='inc/angular.js')
-	body(ng-app='survivalApp', ng-controller='SurvivalCtrl')
+	body(ng-app='thriveApp', ng-controller='ThriveCtrl')
 		.container(ng-show='!unlocked.win')
 			header.hide
 				h1 Thrive!
@@ -41,9 +41,8 @@ html
 					h4 Followers
 					ul
 						li(ng-repeat='follower in allFollowers')
-							a.followerSelected(href='#', ng-click='deselectFollower()', ng-if='selectedFollower == follower') {{follower.name}}: ({{follower.task.name}})
-							a(href='#', ng-click='selectFollower(follower)', ng-if='selectedFollower != follower') {{follower.name}}: ({{follower.task.name}})
-							a(href='#', ng-click='removeFollower(follower)') #[i.fa.fa-times-circle]
+							a(ng-class='{followerSelected: isSelected(follower)}' ng-click='toggleFollowerSelection(follower)') {{follower.name}}: ({{follower.task.name}})
+							a(ng-click='removeFollower(follower)') #[i.fa.fa-times-circle]
 					h4 Supply
 					ul
 						li(ng-repeat='resource in supply') {{resource.type}}: ({{resource.quantity}})
@@ -51,7 +50,7 @@ html
 					ul
 						li(ng-repeat='lot in plot')
 							| {{lot.type}}: ({{lot.quantity}})
-							a(href='#', ng-click='removeStructure(lot.type)') #[i.fa.fa-times-circle]
+							a(ng-click='removeStructure(lot.type)') #[i.fa.fa-times-circle]
 			button.btn.btn-primary(ng-show='!gameStart' ng-click='startGame()') #[i.fa.fa-play] Start
 			footer.clear
 				p Created by David Moritz
