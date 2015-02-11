@@ -53,7 +53,7 @@ thriveApp.controller('ThriveCtrl', [
 	'$scope',
 	function ThriveCtrl($s) {
 		_.assign($s, {
-			allFollowers: [],
+			followers: [],
 			unlocked: {},
 			supply: [],
 			turns: 0,
@@ -189,7 +189,7 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.addFollower = function addFollower() {
 			var name = $s.randomPlayers.shift();
-			$s.allFollowers.push( new Follower(name) );
+			$s.followers.push( new Follower(name) );
 		};
 
 		$s.collect = function collect(resource, qty) {
@@ -243,7 +243,7 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.pickFollower = function pickFollower() {
 			var idle;
-			_.forEach($s.allFollowers, function(eachFollower) {
+			_.forEach($s.followers, function(eachFollower) {
 				if (eachFollower.task.name == 'idle') {
 					idle = eachFollower;
 				}
@@ -251,7 +251,7 @@ thriveApp.controller('ThriveCtrl', [
 			if (idle) {
 				return idle;
 			}
-			var groups = _.groupBy($s.allFollowers, function(eachFollower) {
+			var groups = _.groupBy($s.followers, function(eachFollower) {
 				return eachFollower.task.name;
 			});
 			groups = _.sortBy(groups, function(group) {
@@ -261,7 +261,7 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.removeFollower = function removeFollower( removedFollower ) {
-			_.remove($s.allFollowers, function(eachFollower) {
+			_.remove($s.followers, function(eachFollower) {
 				return eachFollower == removedFollower;
 			});
 		};
@@ -291,7 +291,7 @@ thriveApp.controller('ThriveCtrl', [
 		setInterval(function clickTicks() {
 			$s.$apply(function() {
 				var capacity = 0;
-				$s.allFollowers.forEach(function forEachFollower(eachFollower) {
+				$s.followers.forEach(function forEachFollower(eachFollower) {
 					if (eachFollower.task.name != 'idle') {
 						$s.addToSupply(eachFollower.task.name, true);
 						$s.eat(eachFollower);
@@ -300,9 +300,9 @@ thriveApp.controller('ThriveCtrl', [
 				_.forEach($s.plot, function(lot) {
 					capacity += lot.capacity * lot.quantity;
 				});
-				if (capacity > $s.allFollowers.length) {
+				if (capacity > $s.followers.length) {
 					$s.addFollower();
-				} else if (capacity < $s.allFollowers.length) {
+				} else if (capacity < $s.followers.length) {
 					$s.removeFollower( $s.pickFollower() );
 				}
 				if (!$s.unlocked.win) {
@@ -318,17 +318,17 @@ thriveApp.controller('ThriveCtrl', [
 				cost: [{}],
 				unlock: 'food'
 			},
-			wood: {
-				increase:2,
-				cooldown:1000,
-				cost: [{}],
-				unlock: 'hut'
-			},
 			food: {
 				increase:3,
 				cooldown:2000,
 				cost: [{}],
 				unlock: 'wood'
+			},
+			wood: {
+				increase:2,
+				cooldown:1000,
+				cost: [{}],
+				unlock: 'hut'
 			},
 			clay: {
 				increase:2,

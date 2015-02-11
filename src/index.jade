@@ -27,20 +27,20 @@ html
 						h3 Location: {{location}}
 					div
 						h3 Add New Resource
-						button.btn.btn-primary(ng-click="addToSupply('water')", ng-disabled='!ready.water') Fetch Water
-						button.btn.btn-primary(ng-click="addToSupply('food')", ng-disabled='!ready.food', ng-show='unlocked.food') Gather Food
-						button.btn.btn-primary(ng-click="addToSupply('wood')", ng-disabled='!ready.wood', ng-show='unlocked.wood') Chop Wood
-						button.btn.btn-primary(ng-click="addToSupply('clay')", ng-disabled='!ready.clay', ng-show='unlocked.clay') Dig Clay
-						button.btn.btn-primary(ng-click="addToSupply('brick')", ng-disabled='!ready.brick', ng-show='unlocked.brick') Make Brick
+						button.btn.btn-primary(ng-click="addToSupply('water')", ng-disabled='!ready.water') #[i.fa.fa-coffee] Fetch Water
+						button.btn.btn-primary(ng-click="addToSupply('food')", ng-disabled='!ready.food', ng-show='unlocked.food') #[i.fa.fa-cutlery] Gather Food
+						button.btn.btn-primary(ng-click="addToSupply('wood')", ng-disabled='!ready.wood', ng-show='unlocked.wood') #[i.fa.fa-tree] Chop Wood
+						button.btn.btn-primary(ng-click="addToSupply('clay')", ng-disabled='!ready.clay', ng-show='unlocked.clay') #[i.fa.fa-square-o] Dig Clay
+						button.btn.btn-primary(ng-click="addToSupply('brick')", ng-disabled='!ready.brick', ng-show='unlocked.brick') #[i.fa.fa-pause.fa-rotate-90] Make Brick
 					div
 						h3 Build
-						button.btn.btn-success(ng-click="build('hut')", ng-show='unlocked.hut') Build Hut
-						button.btn.btn-success(ng-click="build('smelter')", ng-show='unlocked.smelter') Build Smelter
-						button.btn.btn-success(ng-click="build('monument')", ng-show='unlocked.monument') Build Monument
+						button.btn.btn-success(ng-click="build('hut')", ng-show='unlocked.hut') #[i.fa.fa-home] Build Hut
+						button.btn.btn-success(ng-click="build('smelter')", ng-show='unlocked.smelter') #[i.fa.fa-building-o] Build Smelter
+						button.btn.btn-success(ng-click="build('monument')", ng-show='unlocked.monument') #[i.fa.fa-male] Build Monument
 				.col-sm-6
 					h4 Followers
 					ul
-						li(ng-repeat='follower in allFollowers')
+						li(ng-repeat='follower in followers')
 							a(ng-class='{followerSelected: isSelected(follower)}' ng-click='toggleFollowerSelection(follower)') {{follower.name}}: ({{follower.task.name}})
 							a(ng-click='removeFollower(follower)') #[i.fa.fa-times-circle]
 					h4 Supply
