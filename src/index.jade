@@ -1,0 +1,62 @@
+doctype html
+html
+	head
+		meta(charset='UTF-8')
+		meta(name='description', content='A game of survival')
+		meta(name='author', content='David Moritz')
+		//- for Bootstrap
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		title Thrive
+		link(rel='shortcut icon', href='favicon.ico')
+		link(rel='stylesheet', href='inc/thrive.css')
+		script(src='inc/angular.js')
+	body(ng-app='survivalApp', ng-controller='SurvivalCtrl')
+		.container(ng-show='!unlocked.win')
+			header.hide
+				h1 Thrive!
+			.jumbotron
+				h2 {{display.text}}
+				button.btn.btn-default(ng-show='display.next', ng-click='nextMessage()') Next
+				.choices(ng-show='!display.next')
+					ul
+						li(ng-repeat='choice in display.choices')
+							button(ng-click='makeChoice(choice.choose)', ng-class='choice.class') {{choice.text}}
+			.row.mainLayout(ng-show='!choice')
+				.col-sm-6
+					div
+						h3 Location: {{location}}
+					div
+						h3 Add New Resource
+						button.btn.btn-primary(ng-click="addToSupply('water')", ng-disabled='!ready.water') Fetch Water
+						button.btn.btn-primary(ng-click="addToSupply('food')", ng-disabled='!ready.food', ng-show='unlocked.food') Gather Food
+						button.btn.btn-primary(ng-click="addToSupply('wood')", ng-disabled='!ready.wood', ng-show='unlocked.wood') Chop Wood
+						button.btn.btn-primary(ng-click="addToSupply('clay')", ng-disabled='!ready.clay', ng-show='unlocked.clay') Dig Clay
+						button.btn.btn-primary(ng-click="addToSupply('brick')", ng-disabled='!ready.brick', ng-show='unlocked.brick') Make Brick
+					div
+						h3 Build
+						button.btn.btn-success(ng-click="build('hut')", ng-show='unlocked.hut') Build Hut
+						button.btn.btn-success(ng-click="build('smelter')", ng-show='unlocked.smelter') Build Smelter
+						button.btn.btn-success(ng-click="build('monument')", ng-show='unlocked.monument') Build Monument
+				.col-sm-6
+					h4 Followers
+					ul
+						li(ng-repeat='follower in allFollowers')
+							a.followerSelected(href='#', ng-click='deselectFollower()', ng-if='selectedFollower == follower') {{follower.name}}: ({{follower.task.name}})
+							a(href='#', ng-click='selectFollower(follower)', ng-if='selectedFollower != follower') {{follower.name}}: ({{follower.task.name}})
+							a(href='#', ng-click='removeFollower(follower)') #[i.fa.fa-times-circle]
+					h4 Supply
+					ul
+						li(ng-repeat='resource in supply') {{resource.type}}: ({{resource.quantity}})
+					h4 Plot
+					ul
+						li(ng-repeat='lot in plot')
+							| {{lot.type}}: ({{lot.quantity}})
+							a(href='#', ng-click='removeStructure(lot.type)') #[i.fa.fa-times-circle]
+			button.btn.btn-primary(ng-show='!gameStart' ng-click='startGame()') #[i.fa.fa-play] Start
+			footer.clear
+				p Created by David Moritz
+		div(ng-show='unlocked.win')
+			.jumbotron
+				h1 Congratulations! You built a monument!
+				h4 It only took you {{turns}} turns.
+		| @@javascriptReplaceFiles

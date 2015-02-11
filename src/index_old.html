@@ -2,8 +2,8 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta name="description" content="A game of survival" />
-	<meta name="author" content="David Moritz" />
+	<meta name="description" content="A game of survival">
+	<meta name="author" content="David Moritz">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- for Bootstrap -->
 	<title>Thrive</title>
 	<link rel="shortcut icon" href="favicon.ico">
@@ -19,17 +19,17 @@
 			<h2>{{display.text}}</h2>
 			<button class="btn btn-default" ng-show="display.next" ng-click="nextMessage()">Next</button>
 			<div class="choices" ng-show="!display.next">
-			    <ul>
-			        <li ng-repeat="choice in display.choices">
-			            <button ng-click="makeChoice(choice.choose)" ng-class="choice.class">{{choice.text}}</button>
-			        </li>
-			    </ul>
+				<ul>
+					<li ng-repeat="choice in display.choices">
+						<button ng-click="makeChoice(choice.choose)" ng-class="choice.class">{{choice.text}}</button>
+					</li>
+				</ul>
 			</div>
 		</div>
 		<div class='row mainLayout' ng-show="!choice">
 			<div class='col-sm-6'>
 				<div>
-				    <h3>Location: {{location}}</h3>
+					<h3>Location: {{location}}</h3>
 				</div>
 				<div>
 					<h3>Add New Resource</h3>
@@ -50,8 +50,8 @@
 				<h4>Followers</h4>
 				<ul>
 					<li ng-repeat="follower in allFollowers">
-					    <a href='#' class="followerSelected" ng-click="deselectFollower()" ng-if="selectedFollower == follower">{{follower.name}}: ({{follower.task.name}})</a>
-                        <a href='#' ng-click="selectFollower(follower)" ng-if="selectedFollower != follower">{{follower.name}}: ({{follower.task.name}})</a>
+						<a href='#' class="followerSelected" ng-click="deselectFollower()" ng-if="selectedFollower == follower">{{follower.name}}: ({{follower.task.name}})</a>
+						<a href='#' ng-click="selectFollower(follower)" ng-if="selectedFollower != follower">{{follower.name}}: ({{follower.task.name}})</a>
 						<a href='#' ng-click="removeFollower(follower)"><span class="glyphicon glyphicon-remove-sign"></span></a>
 					</li>
 				</ul>
@@ -69,7 +69,7 @@
 			</div>
 		</div>
 		<div ng-show="!gameStart">
-		    <button class="btn btn-primary" ng-click="startGame()">Start</button>
+			<button class="btn btn-primary" ng-click="startGame()"><i class="fa fa-play"></i> Start</button>
 		</div>
 		<footer class='clear'>
 			<br>&nbsp;

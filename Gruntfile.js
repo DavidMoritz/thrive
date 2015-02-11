@@ -3,7 +3,23 @@ module.exports = function(grunt) {
 	// load in package.json to reference any data from it (like the version number)
 	grunt.initConfig({
 		pkg: grunt.file.readJSON("package.json"),
+		jade: {
+			compile: {
+				options: {
+					pretty: true
+				},
+				files: grunt.file.expandMapping(['**/*.jade'], 'dist/', {
+					cwd: 'src',
+					rename: function(destBase, destPath) {
+						return destBase + destPath.replace(/\.jade$/, '.html');
+					}
+				})
+
+			}
+		}
 	});
+
+	console.log('stuff is happening');
 
 	// Define other properties of the config object
 	// Define the root directory for distribution
@@ -19,16 +35,18 @@ module.exports = function(grunt) {
 
 	// Define banner for css and js files
 	var banner = "/*!\n" +
-          " * <%= pkg.description %> - v<%= pkg.version %> \n" +
-          " * Build Date: <%= grunt.template.today('yyyy.mm.dd') %> \n" +
-          " * Docs: <%= pkg.homepage %> \n" +
-          " * Coded @ <%= pkg.author %> \n" +
-          " */ \n \n";
+		  " * <%= pkg.description %> - v<%= pkg.version %> \n" +
+		  " * Build Date: <%= grunt.template.today('yyyy.mm.dd') %> \n" +
+		  " * Docs: <%= pkg.homepage %> \n" +
+		  " * Coded @ <%= pkg.author %> \n" +
+		  " */ \n \n";
   // Access this config option using <%= banner %>
 	grunt.config.set("banner", banner);
 
 	// Load Grunt plugins from the config files in the grunt/ directory
 	grunt.loadTasks("grunt");
+
+	grunt.loadNpmTasks('grunt-contrib-jade');
 
 	// Register task for developing locally
 	// Runs all of the dev task plus runs watch
@@ -43,6 +61,7 @@ module.exports = function(grunt) {
 	// If you run this task all of the example html files and generated documentation will reference the unminified version of Edge UI's css and js
 	grunt.registerTask("dev", [
 		"clean",
+		"jade",
 		"less:dev",
 		"copy:dev",
 		"replace:dev",
@@ -72,5 +91,4 @@ module.exports = function(grunt) {
 		"dev",
 		"watch"
 	]);
-
 };
