@@ -59,6 +59,7 @@ thriveApp.controller('ThriveCtrl', [
 			},
 			supply: [],
 			turns: 0,
+			minutes: 0,
 			plot: [],
 			plotMax: 20,
 			messagelog: [],
@@ -303,6 +304,7 @@ thriveApp.controller('ThriveCtrl', [
 				}
 				if (!$s.unlocked.win) {
 					$s.turns++;
+					$s.minutes = $s.turns / 20;
 				}
 			});
 		}, 5000);
