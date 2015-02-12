@@ -309,45 +309,45 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.resourceTypes = {
 			water: {
-				name: "water",
-				icon: "fa-coffee",
-				text: "Fetch Water",
+				name: 'water',
+				icon: 'fa-coffee',
+				text: 'Fetch Water',
 				increase:5,
 				cooldown:4000,
 				cost: [{}],
 				unlock: 'food'
 			},
 			food: {
-				name: "food",
-				icon: "fa-cutlery",
-				text: "Gather food",
+				name: 'food',
+				icon: 'fa-cutlery',
+				text: 'Gather food',
 				increase:3,
 				cooldown:2000,
 				cost: [{}],
 				unlock: 'wood'
 			},
 			wood: {
-				name: "wood",
-				icon: "fa-tree",
-				text: "Chop Wood",
+				name: 'wood',
+				icon: 'fa-tree',
+				text: 'Chop Wood',
 				increase:2,
 				cooldown:1000,
 				cost: [{}],
 				unlock: 'hut'
 			},
 			clay: {
-				name: "clay",
-				icon: "fa-square-o",
-				text: "Dig Clay",
+				name: 'clay',
+				icon: 'fa-square-o',
+				text: 'Dig Clay',
 				increase:2,
 				cooldown:2000,
 				cost: [{}],
 				unlock: 'smelter'
 			},
 			brick: {
-				name: "brick",
-				icon: "fa-pause fa-rotate-90",
-				text: "Make brick",
+				name: 'brick',
+				icon: 'fa-pause fa-rotate-90',
+				text: 'Make brick',
 				increase:1,
 				cooldown:2000,
 				cost: [{
@@ -363,9 +363,9 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.buildingTypes = {
 			hut: {
-				name: "hut",
-				text: "Build Hut",
-				icon: "fa-home",
+				name: 'hut',
+				text: 'Build Hut',
+				icon: 'fa-home',
 				size: 1,
 				cooldown: 2000,
 				capacity: 1,
@@ -376,9 +376,9 @@ thriveApp.controller('ThriveCtrl', [
 				unlock: 'clay'
 			},
 			smelter: {
-				name: "smelter",
-				text: "Build Smelter",
-				icon: "fa-building-o",
+				name: 'smelter',
+				text: 'Build Smelter',
+				icon: 'fa-building-o',
 				size: 2,
 				cooldown: 2000,
 				capacity: 0,
@@ -389,9 +389,9 @@ thriveApp.controller('ThriveCtrl', [
 				unlock: 'brick'
 			},
 			monument: {
-				name: "monument",
-				text: "Build Monument",
-				icon: "fa-male",
+				name: 'monument',
+				text: 'Build Monument',
+				icon: 'fa-male',
 				size: 10,
 				cooldown: 2000,
 				capacity: 0,

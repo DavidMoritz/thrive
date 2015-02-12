@@ -1,7 +1,7 @@
 /**
  * concatenate scripts together for dev
  */
-module.exports = function(grunt) {
+module.exports = function exportConcat(grunt) {
 	grunt.config.set('concat', {
 		dev: {
 			options: {

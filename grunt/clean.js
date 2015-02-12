@@ -1,8 +1,7 @@
 /**
  * Cleans the dist directory (deletes all files)
  */
-module.exports = function(grunt) {
-
+module.exports = function exportClean(grunt) {
 	grunt.config('clean', {
 		dist: ['dist']
 	});

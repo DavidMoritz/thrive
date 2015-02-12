@@ -1,7 +1,7 @@
 /**
  * concat and minify scripts
  */
-module.exports = function(grunt) {
+module.exports = function exportUglify(grunt) {
 	grunt.config.set('uglify', {
 		prod: {
 			options: {

@@ -1,5 +1,4 @@
-module.exports = function(grunt) {
-
+module.exports = function exportPleeease(grunt) {
 	grunt.config('pleeease', {
 		dev: {
 			options: {

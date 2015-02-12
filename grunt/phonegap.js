@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function exportPhonegap(grunt) {
 	grunt.config('phonegap', {
 		phonegap: {
 			config: {

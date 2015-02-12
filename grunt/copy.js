@@ -1,5 +1,4 @@
-module.exports = function(grunt) {
-
+module.exports = function exportCopy(grunt) {
 	grunt.config('copy', {
 		dev: {
 			files: [
@@ -108,5 +107,4 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
-
 };

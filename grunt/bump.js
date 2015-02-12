@@ -1,15 +1,14 @@
-module.exports = function(grunt) {
-	
+module.exports = function exportBump(grunt) {
 	grunt.config('bump', {
 		options: {
-     		files: [
-     			'package.json',
-     			'bower.json'
-     		],
-     		commit: false,
-     		push: false,
-     		createTag: false
-     	}
+			files: [
+				'package.json',
+				'bower.json'
+			],
+			commit: false,
+			push: false,
+			createTag: false
+		}
 	});
 
 	grunt.loadNpmTasks('grunt-bump');
