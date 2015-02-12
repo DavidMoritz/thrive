@@ -126,7 +126,7 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.build = function build(type) {
 			var struct = _.findWhere($s.plot, {type: type}),
-				info = $s.buildingTypes[type],
+				info = _.findWhere($s.buildingTypes, {name: type}),
 				available = true,
 				purchase = [];
 
@@ -201,7 +201,7 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.addToSupply = function addToSupply(resource, auto) {
 			resource = resource || $s.type;
-			var info = $s.resourceTypes[resource],
+			var info = _.findWhere($s.resourceTypes, {name: resource}),
 				tempSupply = $s.supply,
 				available = true;
 
@@ -312,101 +312,91 @@ thriveApp.controller('ThriveCtrl', [
 			});
 		}, 5000);
 
-		$s.resourceTypes = {
-			water: {
-				name: 'water',
-				icon: 'fa-coffee',
-				text: 'Fetch Water',
-				increase:5,
-				cooldown:4000,
-				cost: [{}],
-				unlock: 'food'
-			},
-			food: {
-				name: 'food',
-				icon: 'fa-cutlery',
-				text: 'Gather food',
-				increase:3,
-				cooldown:2000,
-				cost: [{}],
-				unlock: 'wood'
-			},
-			wood: {
-				name: 'wood',
-				icon: 'fa-tree',
-				text: 'Chop Wood',
-				increase:2,
-				cooldown:1000,
-				cost: [{}],
-				unlock: 'hut'
-			},
-			clay: {
+		$s.resourceTypes = [{
+			name: 'water',
+			icon: 'fa-coffee',
+			text: 'Fetch Water',
+			increase:5,
+			cooldown:4000,
+			cost: [{}],
+			unlock: 'food'
+		},{
+			name: 'food',
+			icon: 'fa-cutlery',
+			text: 'Gather food',
+			increase:3,
+			cooldown:2000,
+			cost: [{}],
+			unlock: 'wood'
+		},{
+			name: 'wood',
+			icon: 'fa-tree',
+			text: 'Chop Wood',
+			increase:2,
+			cooldown:1000,
+			cost: [{}],
+			unlock: 'hut'
+		},{
+			name: 'clay',
+			icon: 'fa-cloud',
+			text: 'Dig Clay',
+			increase:2,
+			cooldown:2000,
+			cost: [{}],
+			unlock: 'smelter'
+		},{
+			name: 'brick',
+			icon: 'fa-pause fa-rotate-90',
+			text: 'Make brick',
+			increase:1,
+			cooldown:2000,
+			cost: [{
 				name: 'clay',
-				icon: 'fa-cloud',
-				text: 'Dig Clay',
-				increase:2,
-				cooldown:2000,
-				cost: [{}],
-				unlock: 'smelter'
-			},
-			brick: {
-				name: 'brick',
-				icon: 'fa-pause fa-rotate-90',
-				text: 'Make brick',
-				increase:1,
-				cooldown:2000,
-				cost: [{
-					name: 'clay',
-					amount: 2
-				}, {
-					name: 'wood',
-					amount: 2
-				}],
-				unlock: 'monument'
-			}
-		};
+				amount: 2
+			}, {
+				name: 'wood',
+				amount: 2
+			}],
+			unlock: 'monument'
+		}];
 
-		$s.buildingTypes = {
-			hut: {
-				name: 'hut',
-				text: 'Build Hut',
-				icon: 'fa-home',
-				size: 1,
-				cooldown: 2000,
-				capacity: 1,
-				cost: [{
-					name: 'wood',
-					amount: 10
-				}],
-				unlock: 'clay'
-			},
-			smelter: {
-				name: 'smelter',
-				text: 'Build Smelter',
-				icon: 'fa-building-o',
-				size: 2,
-				cooldown: 2000,
-				capacity: 0,
-				cost: [{
-					name: 'clay',
-					amount: 100
-				}],
-				unlock: 'brick'
-			},
-			monument: {
-				name: 'monument',
-				text: 'Build Monument',
-				icon: 'fa-male',
-				size: 10,
-				cooldown: 2000,
-				capacity: 0,
-				cost: [{
-					name: 'brick',
-					amount: 300
-				}],
-				unlock: 'win'
-			}
-		};
+		$s.buildingTypes = [{
+			name: 'hut',
+			text: 'Build Hut',
+			icon: 'fa-home',
+			size: 1,
+			cooldown: 2000,
+			capacity: 1,
+			cost: [{
+				name: 'wood',
+				amount: 10
+			}],
+			unlock: 'clay'
+		},{
+			name: 'smelter',
+			text: 'Build Smelter',
+			icon: 'fa-building-o',
+			size: 2,
+			cooldown: 2000,
+			capacity: 0,
+			cost: [{
+				name: 'clay',
+				amount: 100
+			}],
+			unlock: 'brick'
+		},{
+			name: 'monument',
+			text: 'Build Monument',
+			icon: 'fa-male',
+			size: 10,
+			cooldown: 2000,
+			capacity: 0,
+			cost: [{
+				name: 'brick',
+				amount: 300
+			}],
+			unlock: 'win'
+		}];
 
 		//  Let's randomize the 200 most popular first names of the those born in the 1980's for players
 		$s.randomPlayers = _.shuffle(['Michael', 'Christopher', 'Matthew', 'Joshua', 'David', 'Chandler', 'James', 'Daniel', 'Robert', 'John', 'Joseph', 'Jason', 'Justin', 'Andrew', 'Ryan', 'William', 'Brian', 'Brandon', 'Jonathan', 'Nicholas', 'Anthony', 'Eric', 'Adam', 'Kevin', 'Thomas', 'Steven', 'Timothy', 'Richard', 'Jeremy', 'Jeffrey', 'Kyle', 'Benjamin', 'Joey', 'Aaron', 'Charles', 'Mark', 'Jacob', 'Stephen', 'Patrick', 'Scott', 'Nathan', 'Paul', 'Sean', 'Travis', 'Zachary', 'Dustin', 'Gregory', 'Kenneth', 'Jose', 'Tyler', 'Jesse', 'Alexander', 'Bryan', 'Samuel', 'Ross', 'Derek', 'Bradley', 'Chad', 'Shawn', 'Edward', 'Jared', 'Cody', 'Jordan', 'Peter', 'Corey', 'Keith', 'Marcus', 'Juan', 'Donald', 'Ronald', 'Phillip', 'George', 'Cory', 'Joel', 'Shane', 'Douglas', 'Antonio', 'Raymond', 'Carlos', 'Brett', 'Gary', 'Alex', 'Nathaniel', 'Craig', 'Ian', 'Luis', 'Derrick', 'Erik', 'Casey', 'Philip', 'Frank', 'Evan', 'Rachel', 'Gabriel', 'Victor', 'Vincent', 'Larry', 'Austin', 'Brent', 'Seth', 'Wesley', 'Dennis', 'Todd', 'Christian', 'Jessica', 'Jennifer', 'Amanda', 'Ashley', 'Sarah', 'Stephanie', 'Melissa', 'Nicole', 'Elizabeth', 'Heather', 'Tiffany', 'Michelle', 'Amber', 'Megan', 'Amy', 'Kimberly', 'Christina', 'Lauren', 'Crystal', 'Brittany', 'Rebecca', 'Laura', 'Danielle', 'Emily', 'Samantha', 'Angela', 'Erin', 'Kelly', 'Sara', 'Lisa', 'Katherine', 'Andrea', 'Jamie', 'Mary', 'Erica', 'Courtney', 'Kristen', 'Shannon', 'April', 'Katie', 'Lindsey', 'Kristin', 'Lindsay', 'Christine', 'Alicia', 'Vanessa', 'Maria', 'Kathryn', 'Allison', 'Julie', 'Anna', 'Tara', 'Kayla', 'Natalie', 'Victoria', 'Jacqueline', 'Holly', 'Kristina', 'Patricia', 'Cassandra', 'Brandy', 'Whitney', 'Chelsea', 'Brandi', 'Catherine', 'Cynthia', 'Kathleen', 'Veronica', 'Leslie', 'Phoebe', 'Natasha', 'Krystal', 'Stacy', 'Diana', 'Monica', 'Erika', 'Dana', 'Jenna', 'Carrie', 'Leah', 'Melanie', 'Brooke', 'Karen', 'Alexandra', 'Valerie', 'Caitlin', 'Julia', 'Alyssa', 'Jasmine', 'Hannah', 'Stacey', 'Brittney', 'Susan', 'Margaret', 'Sandra', 'Candice', 'Latoya', 'Bethany', 'Misty']);
