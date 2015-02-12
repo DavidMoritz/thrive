@@ -11,7 +11,7 @@ html
 		link(rel='stylesheet', href='inc/thrive.css')
 		script(src='inc/angular.js')
 	body(ng-app='thriveApp', ng-controller='ThriveCtrl')
-		.container(ng-show='!unlocked.win')
+		.container(ng-if='!isUnlocked("win")')
 			header.hide
 				h1 Thrive!
 			.jumbotron
@@ -20,17 +20,26 @@ html
 				.choices(ng-show='!display.next')
 					ul
 						li(ng-repeat='choice in display.choices')
-							button(ng-click='makeChoice(choice.choose)', ng-class='choice.class') {{choice.text}}
-			.row.mainLayout(ng-show='!choice')
+							button(ng-click='makeChoice(choice)', ng-class='choice.css.join(" ")') {{choice.buttonText}}
+			.row.mainLayout(ng-if='location && !decisionToMake')
 				.col-sm-6
 					div
-						h3 Location: {{location}}
+						h3 Location: {{location.display}}
 					div
-						h3 Add New Resource
-						button.btn.btn-primary.resource(ng-repeat='resource in resourceTypes' ng-click="addToSupply(resource.name)", ng-disabled='pause[resource.name]', ng-show='unlocked[resource.name]') #[i(class="fa {{resource.icon}}")] {{resource.text}}
+						h3 Get More Resources
+						button.btn.btn-primary.resource(
+							ng-repeat='resource in resources',
+							ng-click="addToSupply(resource)",
+							ng-disabled='!readyToWork',
+							ng-show='isUnlocked(resource.name)'
+						) #[i(class="fa {{resource.icon}}")] {{resource.text}}
 					div
 						h3 Build
-						button.btn.btn-success.building(ng-repeat='building in buildingTypes' ng-click="build(building.name)", ng-show='unlocked[building.name]') #[i(class="fa {{building.icon}}")] {{building.text}}
+						button.btn.btn-success.building(
+							ng-repeat='building in buildings',
+							ng-click="build(building.name)",
+							ng-show='isUnlocked(building.name)'
+						) #[i(class="fa {{building.icon}}")] {{building.text}}
 				.col-sm-6
 					h4 Followers
 					ul
@@ -39,17 +48,17 @@ html
 							a(ng-click='removeFollower(follower)') #[i.fa.fa-times-circle]
 					h4 Supply
 					ul
-						li(ng-repeat='resource in supply') {{resource.type}}: ({{resource.quantity}})
+						li(ng-repeat='supplyItem in supply') {{supplyItem.resource.name}}: ({{supplyItem.quantity}})
 					h4 Plot
 					ul
 						li(ng-repeat='lot in plot')
 							| {{lot.type}}: ({{lot.quantity}})
 							a(ng-click='removeStructure(lot.type)') #[i.fa.fa-times-circle]
-			button.btn.btn-primary(ng-show='!gameStart' ng-click='startGame()') #[i.fa.fa-play] Start
+			button.btn.btn-primary(ng-show='!gameStarted' ng-click='startGame()') #[i.fa.fa-play] Start
 			footer.clear
 				p Created by David Moritz
-		div(ng-show='unlocked.win')
+		.container(ng-if='isUnlocked("win")')
 			.jumbotron
-				h1 Congratulations! You built a monument!
-				h4 It only took you {{minutes}} minutes.
+				h1 Congratulations! You built a monument to your success!
+				h4 It only took you {{turns / 20}} minutes.
 		| @@javascriptReplaceFiles
