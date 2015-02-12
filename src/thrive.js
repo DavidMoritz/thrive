@@ -11,12 +11,12 @@ function Follower(name) {
 	};
 }
 
-function Resource(type, stock) {
+function Resource(type, options) {
 	var self = this;
 
-	self.quantity = stock.increase || 1;
+	self.quantity = options.increase || 1;
 	self.type = type;
-	self.cooldown = stock.cooldown || 5000;
+	self.cooldown = options.cooldown || 5000;
 
 	self.increment = function(qty) {
 		qty = qty || 1;
@@ -24,13 +24,13 @@ function Resource(type, stock) {
 	};
 }
 
-function Structure(type, stock) {
+function Structure(type, options) {
 	var self = this;
 
-	self.quantity = stock.qty || 1;
+	self.quantity = options.qty || 1;
 	self.type = type;
-	self.capacity = stock.capacity || 1;
-	self.size = stock.size || 1;
+	self.capacity = options.capacity || 1;
+	self.size = options.size || 1;
 
 	self.increment = function(qty) {
 		qty = qty || 1;
@@ -54,7 +54,9 @@ thriveApp.controller('ThriveCtrl', [
 	function ThriveCtrl($s) {
 		_.assign($s, {
 			followers: [],
-			unlocked: {},
+			unlocked: {
+				water: true
+			},
 			supply: [],
 			turns: 0,
 			plot: [],
@@ -62,13 +64,7 @@ thriveApp.controller('ThriveCtrl', [
 			messagelog: [],
 			choice: 1,
 			defaultDisplay: {text: 'Thrive!', next: false, choices: []},
-			ready: {
-				water: true,
-				wood: true,
-				food: true,
-				clay: true,
-				brick: true
-			},
+			pause: {},
 			display: null,
 			messages: [],
 			selectedFollower: null
@@ -177,10 +173,10 @@ thriveApp.controller('ThriveCtrl', [
 			time = time || 5000;
 			setTimeout(function() {
 				$s.$apply(function() {
-					$s.ready[resource] = true;
+					$s.pause[resource] = false;
 				});
 			}, time);
-			$s.ready[resource] = false;
+			$s.pause[resource] = true;
 		};
 
 		$s.toggleFollowerSelection = function toggleFollowerSelection(follower) {
@@ -350,7 +346,7 @@ thriveApp.controller('ThriveCtrl', [
 			},
 			brick: {
 				name: "brick",
-				icon: "fa-pause.fa-rotate-90",
+				icon: "fa-pause fa-rotate-90",
 				text: "Make brick",
 				increase:1,
 				cooldown:2000,

@@ -27,10 +27,10 @@ html
 						h3 Location: {{location}}
 					div
 						h3 Add New Resource
-						button.btn.btn-primary.resource(ng-repeat='resource in resourceTypes' ng-click="addToSupply(resource.name)", ng-disabled='!ready[resource.name]', ng-show='unlocked[resource.name]') #[i.fa.{{resource.icon}}] {{resource.text}}
+						button.btn.btn-primary.resource(ng-repeat='resource in resourceTypes' ng-click="addToSupply(resource.name)", ng-disabled='pause[resource.name]', ng-show='unlocked[resource.name]') #[i(class="fa {{resource.icon}}")] {{resource.text}}
 					div
 						h3 Build
-						button.btn.btn-success(ng-repeat='building in buildingTypes' ng-click="build(building.name)", ng-show='unlocked[building.name]') #[i.fa.{{building.icon}}] {{building.text}}
+						button.btn.btn-success.building(ng-repeat='building in buildingTypes' ng-click="build(building.name)", ng-show='unlocked[building.name]') #[i(class="fa {{building.icon}}")] {{building.text}}
 				.col-sm-6
 					h4 Followers
 					ul
