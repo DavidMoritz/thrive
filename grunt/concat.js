@@ -12,7 +12,7 @@ module.exports = function exportConcat(grunt) {
 				'<%= distPath %>lib.js': [
 					'lib/jquery/dist/jquery.js',
 					'lib/bootstrap/dist/js/bootstrap.js',
-					'lib/lodash/dist/lodash.js'
+					'lib/lodash/lodash.js'
 				],
 				'<%= distPath %>thrive.js': [
 					'src/*.js'

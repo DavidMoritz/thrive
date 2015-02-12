@@ -92,12 +92,15 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.addMessage = function addMessage(text, choices) {
 			var next = !choices,
-				check = $s.messages[0] == $s.defaultDisplay;
-			$s.messages.push({
-				text: text,
-				next: next,
-				choices: choices
-			});
+				check = $s.messages[0] == $s.defaultDisplay,
+				message = {
+					text: text,
+					next: next,
+					choices: choices
+				};
+			if(!_.findWhere($s.messages, message)) {
+				$s.messages.push(message);
+			}
 			if (check) {
 				$s.nextMessage();
 			}
@@ -339,7 +342,7 @@ thriveApp.controller('ThriveCtrl', [
 			},
 			clay: {
 				name: 'clay',
-				icon: 'fa-square-o',
+				icon: 'fa-cloud',
 				text: 'Dig Clay',
 				increase:2,
 				cooldown:2000,
