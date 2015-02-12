@@ -2,6 +2,5 @@
   "curly": true,
   "camelcase": true,
   "newcap": true,
-  "quotmark": "double",
   "browser": true
 }
