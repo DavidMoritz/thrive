@@ -44,37 +44,10 @@ function Task() {
 	self.name = 'idle';
 }
 
-<<<<<<< HEAD
-var survivalApp = angular.module("survivalApp", []);
-
-survivalApp.controller("SurvivalCtrl", function($scope) {
-	$s = $scope;
-	$s.allFollowers = [];
-	$s.unlocked = {
-		water: true
-	};
-	$s.supply = [];
-	$s.turns = 0;
-	$s.plot = [];
-	$s.plotMax = 20;
-	$s.messagelog = [];
-	$s.choice = 1;
-	$s.defaultDisplay = {text: "Thrive!", next: false, choices: []};
-	$s.display = $s.defaultDisplay;
-	$s.messages = [$s.defaultDisplay];
-	$s.ready = {
-		water: true,
-		wood: true,
-		food: true,
-		clay: true,
-		brick: true
-	};
-=======
 var thriveApp = angular.module('thriveApp', []);
 thriveApp.run(function runWithDependencies($rootScope) {
 	$rootScope._ = window._;
 });
->>>>>>> 5aeecb5631b1d35f4fae1cf6527d073375f3aaff
 
 thriveApp.controller('ThriveCtrl', [
 	'$scope',
