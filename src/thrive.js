@@ -21,31 +21,37 @@ thriveApp.controller('ThriveCtrl', [
 			};
 		}
 
-		function Resource(type, options) {
-			var self = this;
-
-			self.quantity = options.qtyPerLoad || 1;
-			self.type = type;
-			self.cooldown = options.cooldown || defaultCooldownTime;
-
-			self.increment = function(qty) {
-				qty = qty || 1;
-				self.quantity += qty;
-			};
+		function Resource(resourceOptions) {
+			return _.merge({
+				quantity: 1,
+				cooldown: defaultCooldownTime
+			}, _.pick(resourceOptions, [
+				'name',
+				'text',
+				'icon',
+				'qtyPerLoad',
+				'cooldown',
+				'cost',
+				'unlock'
+			]));
 		}
 
-		function Structure(type, options) {
-			var self = this;
-
-			self.quantity = options.qty || 1;
-			self.type = type;
-			self.capacity = options.capacity || 1;
-			self.size = options.size || 1;
-
-			self.increment = function(qty) {
-				qty = qty || 1;
-				self.quantity += qty;
-			};
+		function Structure(buildingOptions) {
+			return _.merge({
+				quantity: 1,
+				capacity: 1,
+				size: 1,
+				cooldown: defaultCooldownTime
+			}, _.pick(buildingOptions, [
+				'name',
+				'text',
+				'icon',
+				'size',
+				'cooldown',
+				'capacity',
+				'cost',
+				'unlock'
+			]));
 		}
 
 		function Task() {
@@ -68,6 +74,7 @@ thriveApp.controller('ThriveCtrl', [
 			new Choice('location', 'Stream (more water)', 'Stream', ['btn', 'btn-primary']),
 			new Choice('location', 'Forest (more food)', 'Forest', ['btn', 'btn-success'])
 		];
+		var maxLots = 30;
 
 		//	initialize scoped variables
 		_.assign($s, {
@@ -75,8 +82,7 @@ thriveApp.controller('ThriveCtrl', [
 			unlocked: ['water'],
 			supply: [],
 			turns: 0,
-			plot: [],
-			plotMax: 20,
+			lots: [],
 			messagelog: [],
 			decisionToMake: null,
 			defaultDisplay: {text: 'Thrive!', next: false, choices: []},
@@ -136,22 +142,20 @@ thriveApp.controller('ThriveCtrl', [
 			$s.decisionToMake = null;
 		};
 
-		$s.checkAvailabilty = function checkPlot() {
-			var cap = $s.plotMax;
-			_.forEach($s.plot, function(lot) {
-				cap -= lot.quantity * lot.size;
+		$s.checkAvailabilty = function checkAvailabilty() {
+			var cap = _.clone(maxLots);
+			_.forEach($s.lots, function eachLot(lot) {
+				cap -= lot.quantity * lot.building.size;
 			});
 			return cap;
 		};
 
-		$s.build = function build(type) {
-			var struct = _.findWhere($s.plot, {type: type});
-			var building = _.findWhere($s.buildings, {name: type});
+		$s.build = function build(building) {
 			var available = true;
 			var purchase = [];
 
 			_.forEach(building.cost, function eachCostItem(costItem) {
-				var supply = _.findWhere($s.supply, {type: costItem.name});
+				var supply = _.findWhere($s.supply, {resource: costItem});
 				if (supply) {
 					if (supply.quantity >= costItem.amount) {
 						purchase.push({
@@ -159,7 +163,7 @@ thriveApp.controller('ThriveCtrl', [
 							cost: costItem.amount
 						});
 					} else {
-						$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + type + '.');
+						$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + building.name + '.');
 						available = false;
 					}
 				}
@@ -171,14 +175,17 @@ thriveApp.controller('ThriveCtrl', [
 				_.forEach(purchase, function forEachPurchase(eachPurchase) {
 					eachPurchase.resource.quantity -= eachPurchase.cost;
 				});
-				if (struct) {
-					struct.increment(1);
-				} else {
-					$s.unlocked[building.unlock] = true;
-					$s.plot.push( new Structure(type, building) );
+
+				if (!_.findWhere($s.lots, {building: building})) {
+					$s.unlocked.push(building.name);
+					$s.lots.push({
+						building: new Structure(building),
+						quantity: 0
+					});
 				}
+				_.findWhere($s.lots, {building: building}).quantity += 1;
 			} else {
-				$s.addMessage('You don\'t have enough room in your plot to build a ' + type + '.');
+				$s.addMessage('You don\'t have enough room in your plot to build a ' + building.name + '.');
 				return;
 			}
 		};
@@ -213,7 +220,7 @@ thriveApp.controller('ThriveCtrl', [
 			var available = true;
 
 			_.forEach(resource.cost, function eachCostItem(costItem) {
-				var supplyCostItem = _.findWhere($s.supply, {type: costItem.name});
+				var supplyCostItem = _.findWhere($s.supply, {resource: costItem});
 				if (supplyCostItem) {
 					if (supplyCostItem.quantity >= costItem.amount) {
 						supplyCostItem.quantity -= costItem.amount;
@@ -236,7 +243,7 @@ thriveApp.controller('ThriveCtrl', [
 
 			if (!_.findWhere($s.supply, {resource: resource})) {
 				$s.supply.push({
-					resource: resource,
+					resource: new Resource(resource),
 					quantity: 0
 				});
 
@@ -271,20 +278,23 @@ thriveApp.controller('ThriveCtrl', [
 			return groups[0][0];
 		};
 
-		$s.removeFollower = function removeFollower( removedFollower ) {
+		$s.removeFollower = function removeFollower(removedFollower) {
 			_.remove($s.followers, function(eachFollower) {
 				return eachFollower == removedFollower;
 			});
 		};
 
-		$s.removeStructure = function removeStructure( type ) {
-			var structures = _.findWhere($s.plot, {type : type});
-			structures.quantity--;
+		$s.removeStructure = function removeStructure(building) {
+			_.findWhere($s.lots, {building: building}).quantity--;
 		};
 
-		$s.eat = function eat( follower ) {
-			var food = _.findWhere($s.supply, {type: 'food'}),
-				water = _.findWhere($s.supply, {type: 'water'});
+		$s.eat = function eat(follower) {
+			var food = _.find($s.supply, function matchItem(supplyItem) {
+				return supplyItem.resource.name === 'food';
+			});
+			var water = _.find($s.supply, function matchItem(supplyItem) {
+				return supplyItem.resource.name === 'water';
+			});
 
 			if (water.quantity && food.quantity) {
 				water.quantity--;
@@ -298,17 +308,16 @@ thriveApp.controller('ThriveCtrl', [
 			return follower === $s.selectedFollower;
 		};
 
-		//	NOTE: this should be refactored to use the angular interval
 		$interval(function clickTicks() {
 			var capacity = 0;
-			$s.followers.forEach(function forEachFollower(eachFollower) {
-				if (eachFollower.task.name != 'idle') {
-					$s.addToSupply(eachFollower.task.name, true);
-					$s.eat(eachFollower);
+			$s.followers.forEach(function eachFollower(follower) {
+				if (follower.task.name != 'idle') {
+					$s.addToSupply(follower.task.name, true);
+					$s.eat(follower);
 				}
 			});
-			_.forEach($s.plot, function(lot) {
-				capacity += lot.capacity * lot.quantity;
+			_.forEach($s.lots, function eachLot(lot) {
+				capacity += lot.building.capacity * lot.quantity;
 			});
 			if (capacity > $s.followers.length) {
 				$s.addFollower();
@@ -413,7 +422,22 @@ thriveApp.controller('ThriveCtrl', [
 		$s.skipToMiddle = function skipToMiddle() {
 			_.assign($s, {
 				gameStarted: true,
-				location: new Choice('location', 'Stream (plenty of water)', 'Stream', ['btn', 'btn-primary'])
+				location: new Choice('location', 'Stream (plenty of water)', 'Stream', ['btn', 'btn-primary']),
+				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument']
+			});
+			_.forEach($s.resources, function eachResource(resource) {
+				$s.supply.push({
+					resource: new Resource(resource),
+					quantity: 100
+				});
+			});
+			_.forEach($s.buildings, function eachBuilding(building) {
+				if (building.name !== 'monument') {
+					$s.lots.push({
+						building: new Structure(building),
+						quantity: 7
+					});
+				}
 			});
 		};
 
