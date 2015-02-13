@@ -23,7 +23,6 @@ thriveApp.controller('ThriveCtrl', [
 
 		function Resource(resourceOptions) {
 			return _.merge({
-				quantity: 1,
 				cooldown: defaultCooldownTime
 			}, _.pick(resourceOptions, [
 				'name',
@@ -38,7 +37,6 @@ thriveApp.controller('ThriveCtrl', [
 
 		function Structure(buildingOptions) {
 			return _.merge({
-				quantity: 1,
 				capacity: 1,
 				size: 1,
 				cooldown: defaultCooldownTime
@@ -67,6 +65,14 @@ thriveApp.controller('ThriveCtrl', [
 				display: display,
 				css: cssClasses
 			};
+		}
+
+		function getSupplyResource(resourceOrName) {
+			// this accepts EITHER a resource object OR a resource name
+			var resourceName = _.isObject(resourceOrName) ? resourceOrName.name : resourceOrName;
+			return _.find($s.supply, function findResource(supplyItem) {
+				return supplyItem.resource.name === resourceName;
+			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
 		}
 
 		var defaultCooldownTime = 5000;
@@ -155,11 +161,11 @@ thriveApp.controller('ThriveCtrl', [
 			var purchase = [];
 
 			_.forEach(building.cost, function eachCostItem(costItem) {
-				var supply = _.findWhere($s.supply, {resource: costItem});
-				if (supply) {
-					if (supply.quantity >= costItem.amount) {
+				var supplyResource = getSupplyResource(costItem);
+				if (supplyResource) {
+					if (supplyResource.quantity >= costItem.amount) {
 						purchase.push({
-							resource: supply,
+							resource: supplyResource.resource,
 							cost: costItem.amount
 						});
 					} else {
@@ -172,9 +178,10 @@ thriveApp.controller('ThriveCtrl', [
 				return;
 			}
 			if ($s.checkAvailabilty() >= building.size) {
-				_.forEach(purchase, function forEachPurchase(eachPurchase) {
-					eachPurchase.resource.quantity -= eachPurchase.cost;
-				});
+				console.log('this is broken');
+				// _.forEach(purchase, function eachPurchase(purchase) {
+				// 	purchase.resource.quantity -= purchase.cost;
+				// });
 
 				if (!_.findWhere($s.lots, {building: building})) {
 					$s.unlocked.push(building.name);
@@ -220,7 +227,7 @@ thriveApp.controller('ThriveCtrl', [
 			var available = true;
 
 			_.forEach(resource.cost, function eachCostItem(costItem) {
-				var supplyCostItem = _.findWhere($s.supply, {resource: costItem});
+				var supplyCostItem = getSupplyResource(costItem);
 				if (supplyCostItem) {
 					if (supplyCostItem.quantity >= costItem.amount) {
 						supplyCostItem.quantity -= costItem.amount;
@@ -241,7 +248,7 @@ thriveApp.controller('ThriveCtrl', [
 				$s.selectedFollower = null;
 			}
 
-			if (!_.findWhere($s.supply, {resource: resource})) {
+			if (!getSupplyResource(resource)) {
 				$s.supply.push({
 					resource: new Resource(resource),
 					quantity: 0
@@ -252,7 +259,7 @@ thriveApp.controller('ThriveCtrl', [
 				}
 			}
 
-			_.findWhere($s.supply, {resource: resource}).quantity += resource.qtyPerLoad;
+			getSupplyResource(resource).quantity += resource.qtyPerLoad;
 
 			if (!auto){
 				$s.coolDown(resource, resource.cooldown);
@@ -289,12 +296,8 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.eat = function eat(follower) {
-			var food = _.find($s.supply, function matchItem(supplyItem) {
-				return supplyItem.resource.name === 'food';
-			});
-			var water = _.find($s.supply, function matchItem(supplyItem) {
-				return supplyItem.resource.name === 'water';
-			});
+			var food = getSupplyResource('food');
+			var water = getSupplyResource('water');
 
 			if (water.quantity && food.quantity) {
 				water.quantity--;
