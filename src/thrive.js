@@ -193,7 +193,6 @@ thriveApp.controller('ThriveCtrl', [
 				_.findWhere($s.lots, {building: building}).quantity += 1;
 			} else {
 				$s.addMessage('You don\'t have enough room in your plot to build a ' + building.name + '.');
-				return;
 			}
 		};
 
