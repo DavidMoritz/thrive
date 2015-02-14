@@ -21,8 +21,15 @@ thriveApp.controller('ThriveCtrl', [
 			};
 		}
 
+		function SupplyResource(options) {
+			_.merge(this, {
+				quantity: options.quantity || 0,
+				resource: new Resource(options.resource)
+			});
+		}
+
 		function Resource(resourceOptions) {
-			return _.merge({
+			_.merge(this, {
 				cooldown: defaultCooldownTime
 			}, _.pick(resourceOptions, [
 				'name',
@@ -36,7 +43,7 @@ thriveApp.controller('ThriveCtrl', [
 		}
 
 		function Structure(buildingOptions) {
-			return _.merge({
+			_.merge(this, {
 				capacity: 1,
 				size: 1,
 				cooldown: defaultCooldownTime
@@ -331,53 +338,59 @@ thriveApp.controller('ThriveCtrl', [
 			}
 		}, defaultCooldownTime, $s.turns);
 
-		$s.resources = [{
-			name: 'water',
-			icon: 'fa-coffee',
-			text: 'Fetch Water',
-			qtyPerLoad: 5,
-			cooldown: 4000,
-			cost: [],
-			unlock: 'food'
-		},{
-			name: 'food',
-			icon: 'fa-cutlery',
-			text: 'Gather food',
-			qtyPerLoad: 3,
-			cooldown: 2000,
-			cost: [],
-			unlock: 'wood'
-		},{
-			name: 'wood',
-			icon: 'fa-tree',
-			text: 'Chop Wood',
-			qtyPerLoad: 2,
-			cooldown: 1000,
-			cost: [],
-			unlock: 'hut'
-		},{
-			name: 'clay',
-			icon: 'fa-cloud',
-			text: 'Dig Clay',
-			qtyPerLoad: 2,
-			cooldown: 2000,
-			cost: [],
-			unlock: 'smelter'
-		},{
-			name: 'brick',
-			icon: 'fa-pause fa-rotate-90',
-			text: 'Make brick',
-			qtyPerLoad: 1,
-			cooldown: 2000,
-			cost: [{
-				name: 'clay',
-				amount: 2
-			}, {
+		$s.resources = [
+			new Resource({
+				name: 'water',
+				icon: 'fa-coffee',
+				text: 'Fetch Water',
+				qtyPerLoad: 5,
+				cooldown: 4000,
+				cost: [],
+				unlock: 'food'
+			}),
+			new Resource({
+				name: 'food',
+				icon: 'fa-cutlery',
+				text: 'Gather food',
+				qtyPerLoad: 3,
+				cooldown: 2000,
+				cost: [],
+				unlock: 'wood'
+			}),
+			new Resource({
 				name: 'wood',
-				amount: 2
-			}],
-			unlock: 'monument'
-		}];
+				icon: 'fa-tree',
+				text: 'Chop Wood',
+				qtyPerLoad: 2,
+				cooldown: 1000,
+				cost: [],
+				unlock: 'hut'
+			}),
+			new Resource({
+				name: 'clay',
+				icon: 'fa-cloud',
+				text: 'Dig Clay',
+				qtyPerLoad: 2,
+				cooldown: 2000,
+				cost: [],
+				unlock: 'smelter'
+			}),
+			new Resource({
+				name: 'brick',
+				icon: 'fa-pause fa-rotate-90',
+				text: 'Make brick',
+				qtyPerLoad: 1,
+				cooldown: 2000,
+				cost: [{
+					name: 'clay',
+					amount: 2
+				}, {
+					name: 'wood',
+					amount: 2
+				}],
+				unlock: 'monument'
+			})
+		];
 
 		$s.buildings = [{
 			name: 'hut',
@@ -428,10 +441,10 @@ thriveApp.controller('ThriveCtrl', [
 				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument']
 			});
 			_.forEach($s.resources, function eachResource(resource) {
-				$s.supply.push({
+				$s.supply.push(new SupplyResource({
 					resource: new Resource(resource),
 					quantity: 100
-				});
+				}));
 			});
 			_.forEach($s.buildings, function eachBuilding(building) {
 				if (building.name !== 'monument') {
