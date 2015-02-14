@@ -24,7 +24,7 @@ thriveApp.controller('ThriveCtrl', [
 		function SupplyResource(options) {
 			_.merge(this, {
 				quantity: options.quantity || 0,
-				resource: new Resource(options.resource)
+				resource: new Resource(options.resource)	//	pass in object with resource parameter
 			});
 		}
 
@@ -40,6 +40,13 @@ thriveApp.controller('ThriveCtrl', [
 				'cost',
 				'unlock'
 			]));
+		}
+
+		function LotStructure(options) {
+			_.merge(this, {
+				quantity: options.quantity || 0,
+				structure: new Structure(options.structure)
+			});
 		}
 
 		function Structure(buildingOptions) {
@@ -60,9 +67,7 @@ thriveApp.controller('ThriveCtrl', [
 		}
 
 		function Task() {
-			var self = this;
-
-			self.name = 'idle';
+			this.name = 'idle';
 		}
 
 		function Choice(subject, buttonText, display, cssClasses) {
@@ -79,6 +84,14 @@ thriveApp.controller('ThriveCtrl', [
 			var resourceName = _.isObject(resourceOrName) ? resourceOrName.name : resourceOrName;
 			return _.find($s.supply, function findResource(supplyItem) {
 				return supplyItem.resource.name === resourceName;
+			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
+		}
+
+		function getLotStructure(structureOrName) {
+			// this accepts EITHER a structure object OR a structure name
+			var structureName = _.isObject(structureOrName) ? structureOrName.name : structureOrName;
+			return _.find($s.lots, function findStructure(lot) {
+				return lot.structure.name === structureName;
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
 		}
 
@@ -158,7 +171,7 @@ thriveApp.controller('ThriveCtrl', [
 		$s.checkAvailabilty = function checkAvailabilty() {
 			var cap = _.clone(maxLots);
 			_.forEach($s.lots, function eachLot(lot) {
-				cap -= lot.quantity * lot.building.size;
+				cap -= lot.quantity * lot.structure.size;
 			});
 			return cap;
 		};
@@ -186,19 +199,16 @@ thriveApp.controller('ThriveCtrl', [
 			}
 			if ($s.checkAvailabilty() >= building.size) {
 				_.forEach(purchase, function eachPurchase(purchase) {
-					_.findWhere($s.supply, {resource: purchase.resource}).quantity -= purchase.cost;
+					getSupplyResource(purchase.resource).quantity -= purchase.cost;
 				});
 
-				var buildingCopy = new Structure(angular.copy(building));
-
-				if (!_.findWhere($s.lots, {building: buildingCopy})) {
+				if (!getLotStructure(building)) {
 					$s.unlocked.push(building.name);
-					$s.lots.push({
-						building: new Structure(building),
-						quantity: 0
-					});
+					$s.lots.push(new LotStructure({
+						structure: new Structure(building)
+					}));
 				}
-				_.findWhere($s.lots, {building: buildingCopy}).quantity += 1;
+				getLotStructure(building).quantity += 1;
 			} else {
 				$s.addMessage('You don\'t have enough room in your plot to build a ' + building.name + '.');
 			}
@@ -256,10 +266,9 @@ thriveApp.controller('ThriveCtrl', [
 			}
 
 			if (!getSupplyResource(resource)) {
-				$s.supply.push({
-					resource: new Resource(resource),
-					quantity: 0
-				});
+				$s.supply.push(new SupplyResource({
+					resource: new Resource(resource)
+				}));
 
 				if (resource.unlock) {
 					$s.unlocked.push(resource.unlock);
@@ -299,7 +308,7 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.removeStructure = function removeStructure(building) {
-			_.findWhere($s.lots, {building: building}).quantity--;
+			getLotStructure(building).quantity--;
 		};
 
 		$s.eat = function eat(follower) {
@@ -327,7 +336,7 @@ thriveApp.controller('ThriveCtrl', [
 				}
 			});
 			_.forEach($s.lots, function eachLot(lot) {
-				capacity += lot.building.capacity * lot.quantity;
+				capacity += lot.structure.capacity * lot.quantity;
 			});
 			if (capacity > $s.followers.length) {
 				$s.addFollower();
@@ -449,10 +458,10 @@ thriveApp.controller('ThriveCtrl', [
 			});
 			_.forEach($s.buildings, function eachBuilding(building) {
 				if (building.name !== 'monument') {
-					$s.lots.push({
-						building: new Structure(building),
+					$s.lots.push(new LotStructure({
+						structure: new Structure(building),
 						quantity: 7
-					});
+					}));
 				}
 			});
 		};
