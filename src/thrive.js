@@ -12,12 +12,12 @@ thriveApp.controller('ThriveCtrl', [
 			var self = this;
 
 			self.name = name || 'John Doe';
-			self.task = new Task();
+			self.task = idleTask;
 			self.strength = 1;
 			self.id = _.random(1,9999);
 
 			self.newTask = function (task) {
-				self.task.name = task;
+				self.task = task || idleTask;
 			};
 		}
 
@@ -25,6 +25,13 @@ thriveApp.controller('ThriveCtrl', [
 			_.merge(this, {
 				quantity: options.quantity || 0,
 				resource: new Resource(options.resource)	//	pass in object with resource parameter
+			});
+		}
+
+		function LotStructure(options) {
+			_.merge(this, {
+				quantity: options.quantity || 0,
+				structure: new Structure(options.structure)
 			});
 		}
 
@@ -42,41 +49,30 @@ thriveApp.controller('ThriveCtrl', [
 			]));
 		}
 
-		function LotStructure(options) {
+		function Structure(structureOptions) {
 			_.merge(this, {
-				quantity: options.quantity || 0,
-				structure: new Structure(options.structure)
-			});
-		}
-
-		function Structure(buildingOptions) {
-			_.merge(this, {
-				capacity: 1,
-				size: 1,
 				cooldown: defaultCooldownTime
-			}, _.pick(buildingOptions, [
+			}, _.pick(structureOptions, [
 				'name',
 				'text',
 				'icon',
 				'size',
-				'cooldown',
 				'capacity',
+				'cooldown',
 				'cost',
 				'unlock'
 			]));
 		}
 
-		function Task() {
-			this.name = 'idle';
-		}
-
-		function Choice(subject, buttonText, display, cssClasses) {
-			return {
-				subject: subject,
-				buttonText: buttonText,
-				display: display,
-				css: cssClasses
-			};
+		function Choice(choiceOptions) {
+			return _.merge(this, {
+				css: ['btn', 'btn-default']
+			}, _.pick(choiceOptions, [
+				'subject',
+				'buttonText',
+				'display',
+				'css'
+			]));
 		}
 
 		function getSupplyResource(resourceOrName) {
@@ -96,11 +92,10 @@ thriveApp.controller('ThriveCtrl', [
 		}
 
 		var defaultCooldownTime = 5000;
-		var locations = [
-			new Choice('location', 'Stream (more water)', 'Stream', ['btn', 'btn-primary']),
-			new Choice('location', 'Forest (more food)', 'Forest', ['btn', 'btn-success'])
-		];
 		var maxLots = 30;
+		var idleTask = {
+			name: 'idle'
+		};
 
 		//	initialize scoped variables
 		_.assign($s, {
@@ -176,11 +171,11 @@ thriveApp.controller('ThriveCtrl', [
 			return cap;
 		};
 
-		$s.build = function build(building) {
+		$s.build = function build(structure) {
 			var available = true;
 			var purchase = [];
 
-			_.forEach(building.cost, function eachCostItem(costItem) {
+			_.forEach(structure.cost, function eachCostItem(costItem) {
 				var supplyResource = getSupplyResource(costItem);
 				if (supplyResource) {
 					if (supplyResource.quantity >= costItem.amount) {
@@ -189,7 +184,7 @@ thriveApp.controller('ThriveCtrl', [
 							cost: costItem.amount
 						});
 					} else {
-						$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + building.name + '.');
+						$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + structure.name + '.');
 						available = false;
 					}
 				}
@@ -197,20 +192,20 @@ thriveApp.controller('ThriveCtrl', [
 			if (!available) {
 				return;
 			}
-			if ($s.checkAvailabilty() >= building.size) {
+			if ($s.checkAvailabilty() >= structure.size) {
 				_.forEach(purchase, function eachPurchase(purchase) {
 					getSupplyResource(purchase.resource).quantity -= purchase.cost;
 				});
 
-				if (!getLotStructure(building)) {
-					$s.unlocked.push(building.name);
+				if (!getLotStructure(structure)) {
+					$s.unlocked.push(structure.name);
 					$s.lots.push(new LotStructure({
-						structure: new Structure(building)
+						structure: new Structure(structure)
 					}));
 				}
-				getLotStructure(building).quantity += 1;
+				getLotStructure(structure).quantity += 1;
 			} else {
-				$s.addMessage('You don\'t have enough room in your plot to build a ' + building.name + '.');
+				$s.addMessage('You don\'t have enough room in your plot to build a ' + structure.name + '.');
 			}
 		};
 
@@ -236,7 +231,7 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.addFollower = function addFollower() {
-			var name = $s.randomPlayers.shift();
+			var name = randomPlayerNames.shift();
 			$s.followers.push( new Follower(name) );
 		};
 
@@ -261,7 +256,7 @@ thriveApp.controller('ThriveCtrl', [
 			}
 
 			if ($s.selectedFollower) {
-				$s.selectedFollower.newTask(resource.name);
+				$s.selectedFollower.newTask(resource);
 				$s.selectedFollower = null;
 			}
 
@@ -283,12 +278,7 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.pickFollower = function pickFollower() {
-			var idle;
-			_.forEach($s.followers, function(eachFollower) {
-				if (eachFollower.task.name == 'idle') {
-					idle = eachFollower;
-				}
-			});
+			var idle = _.findWhere($s.followers, {task: idleTask});
 			if (idle) {
 				return idle;
 			}
@@ -307,8 +297,8 @@ thriveApp.controller('ThriveCtrl', [
 			});
 		};
 
-		$s.removeStructure = function removeStructure(building) {
-			getLotStructure(building).quantity--;
+		$s.removeStructure = function removeStructure(structure) {
+			getLotStructure(structure).quantity--;
 		};
 
 		$s.eat = function eat(follower) {
@@ -319,7 +309,7 @@ thriveApp.controller('ThriveCtrl', [
 				water.quantity--;
 				food.quantity--;
 			} else {
-				follower.newTask('idle');
+				follower.newTask(idleTask);
 			}
 		};
 
@@ -330,8 +320,9 @@ thriveApp.controller('ThriveCtrl', [
 		$interval(function clickTicks() {
 			var capacity = 0;
 			$s.followers.forEach(function eachFollower(follower) {
-				if (follower.task.name != 'idle') {
-					$s.addToSupply(follower.task.name, true);
+				if (follower.task != idleTask) {
+					$s.addToSupply(follower.task, true);
+					// I'd rather 'eat' be a follower method, but I don't know how
 					$s.eat(follower);
 				}
 			});
@@ -402,7 +393,7 @@ thriveApp.controller('ThriveCtrl', [
 			})
 		];
 
-		$s.buildings = [{
+		$s.structures = [{
 			name: 'hut',
 			text: 'Build Hut',
 			icon: 'fa-home',
@@ -440,6 +431,21 @@ thriveApp.controller('ThriveCtrl', [
 			unlock: 'win'
 		}];
 
+		var locations = [
+			new Choice({
+				subject: 'location',
+				buttonText: 'Stream (more water)',
+				display: 'Stream',
+				css: ['btn', 'btn-primary']
+			}),
+			new Choice({
+				subject: 'location',
+				buttonText: 'Forest (more food)',
+				display: 'Forest',
+				css: ['btn', 'btn-success']
+			})
+		];
+
 		$s.isUnlocked = function isUnlocked(valueToCheck) {
 			return _.contains($s.unlocked, valueToCheck);
 		};
@@ -447,7 +453,12 @@ thriveApp.controller('ThriveCtrl', [
 		$s.skipToMiddle = function skipToMiddle() {
 			_.assign($s, {
 				gameStarted: true,
-				location: new Choice('location', 'Stream (plenty of water)', 'Stream', ['btn', 'btn-primary']),
+				location: new Choice({
+					subject: 'location',
+					buttonText: 'Stream (more water)',
+					display: 'Stream',
+					css: ['btn', 'btn-primary']
+				}),
 				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument']
 			});
 			_.forEach($s.resources, function eachResource(resource) {
@@ -456,17 +467,17 @@ thriveApp.controller('ThriveCtrl', [
 					quantity: 100
 				}));
 			});
-			_.forEach($s.buildings, function eachBuilding(building) {
-				if (building.name !== 'monument') {
+			_.forEach($s.structures, function eachStructure(structure) {
+				if (structure.name !== 'monument') {
 					$s.lots.push(new LotStructure({
-						structure: new Structure(building),
+						structure: new Structure(structure),
 						quantity: 7
 					}));
 				}
 			});
 		};
 
-		//  Let's randomize the 200 most popular first names of the those born in the 1980's for players
-		$s.randomPlayers = _.shuffle(['Michael', 'Christopher', 'Matthew', 'Joshua', 'David', 'Chandler', 'James', 'Daniel', 'Robert', 'John', 'Joseph', 'Jason', 'Justin', 'Andrew', 'Ryan', 'William', 'Brian', 'Brandon', 'Jonathan', 'Nicholas', 'Anthony', 'Eric', 'Adam', 'Kevin', 'Thomas', 'Steven', 'Timothy', 'Richard', 'Jeremy', 'Jeffrey', 'Kyle', 'Benjamin', 'Joey', 'Aaron', 'Charles', 'Mark', 'Jacob', 'Stephen', 'Patrick', 'Scott', 'Nathan', 'Paul', 'Sean', 'Travis', 'Zachary', 'Dustin', 'Gregory', 'Kenneth', 'Jose', 'Tyler', 'Jesse', 'Alexander', 'Bryan', 'Samuel', 'Ross', 'Derek', 'Bradley', 'Chad', 'Shawn', 'Edward', 'Jared', 'Cody', 'Jordan', 'Peter', 'Corey', 'Keith', 'Marcus', 'Juan', 'Donald', 'Ronald', 'Phillip', 'George', 'Cory', 'Joel', 'Shane', 'Douglas', 'Antonio', 'Raymond', 'Carlos', 'Brett', 'Gary', 'Alex', 'Nathaniel', 'Craig', 'Ian', 'Luis', 'Derrick', 'Erik', 'Casey', 'Philip', 'Frank', 'Evan', 'Rachel', 'Gabriel', 'Victor', 'Vincent', 'Larry', 'Austin', 'Brent', 'Seth', 'Wesley', 'Dennis', 'Todd', 'Christian', 'Jessica', 'Jennifer', 'Amanda', 'Ashley', 'Sarah', 'Stephanie', 'Melissa', 'Nicole', 'Elizabeth', 'Heather', 'Tiffany', 'Michelle', 'Amber', 'Megan', 'Amy', 'Kimberly', 'Christina', 'Lauren', 'Crystal', 'Brittany', 'Rebecca', 'Laura', 'Danielle', 'Emily', 'Samantha', 'Angela', 'Erin', 'Kelly', 'Sara', 'Lisa', 'Katherine', 'Andrea', 'Jamie', 'Mary', 'Erica', 'Courtney', 'Kristen', 'Shannon', 'April', 'Katie', 'Lindsey', 'Kristin', 'Lindsay', 'Christine', 'Alicia', 'Vanessa', 'Maria', 'Kathryn', 'Allison', 'Julie', 'Anna', 'Tara', 'Kayla', 'Natalie', 'Victoria', 'Jacqueline', 'Holly', 'Kristina', 'Patricia', 'Cassandra', 'Brandy', 'Whitney', 'Chelsea', 'Brandi', 'Catherine', 'Cynthia', 'Kathleen', 'Veronica', 'Leslie', 'Phoebe', 'Natasha', 'Krystal', 'Stacy', 'Diana', 'Monica', 'Erika', 'Dana', 'Jenna', 'Carrie', 'Leah', 'Melanie', 'Brooke', 'Karen', 'Alexandra', 'Valerie', 'Caitlin', 'Julia', 'Alyssa', 'Jasmine', 'Hannah', 'Stacey', 'Brittney', 'Susan', 'Margaret', 'Sandra', 'Candice', 'Latoya', 'Bethany', 'Misty']);
+		//  Let's randomize the 200 most popular first names of the those born in the 1980's for followers
+		var randomPlayerNames = _.shuffle(['Michael', 'Christopher', 'Matthew', 'Joshua', 'David', 'Chandler', 'James', 'Daniel', 'Robert', 'John', 'Joseph', 'Jason', 'Justin', 'Andrew', 'Ryan', 'William', 'Brian', 'Brandon', 'Jonathan', 'Nicholas', 'Anthony', 'Eric', 'Adam', 'Kevin', 'Thomas', 'Steven', 'Timothy', 'Richard', 'Jeremy', 'Jeffrey', 'Kyle', 'Benjamin', 'Joey', 'Aaron', 'Charles', 'Mark', 'Jacob', 'Stephen', 'Patrick', 'Scott', 'Nathan', 'Paul', 'Sean', 'Travis', 'Zachary', 'Dustin', 'Gregory', 'Kenneth', 'Jose', 'Tyler', 'Jesse', 'Alexander', 'Bryan', 'Samuel', 'Ross', 'Derek', 'Bradley', 'Chad', 'Shawn', 'Edward', 'Jared', 'Cody', 'Jordan', 'Peter', 'Corey', 'Keith', 'Marcus', 'Juan', 'Donald', 'Ronald', 'Phillip', 'George', 'Cory', 'Joel', 'Shane', 'Douglas', 'Antonio', 'Raymond', 'Carlos', 'Brett', 'Gary', 'Alex', 'Nathaniel', 'Craig', 'Ian', 'Luis', 'Derrick', 'Erik', 'Casey', 'Philip', 'Frank', 'Evan', 'Rachel', 'Gabriel', 'Victor', 'Vincent', 'Larry', 'Austin', 'Brent', 'Seth', 'Wesley', 'Dennis', 'Todd', 'Christian', 'Jessica', 'Jennifer', 'Amanda', 'Ashley', 'Sarah', 'Stephanie', 'Melissa', 'Nicole', 'Elizabeth', 'Heather', 'Tiffany', 'Michelle', 'Amber', 'Megan', 'Amy', 'Kimberly', 'Christina', 'Lauren', 'Crystal', 'Brittany', 'Rebecca', 'Laura', 'Danielle', 'Emily', 'Samantha', 'Angela', 'Erin', 'Kelly', 'Sara', 'Lisa', 'Katherine', 'Andrea', 'Jamie', 'Mary', 'Erica', 'Courtney', 'Kristen', 'Shannon', 'April', 'Katie', 'Lindsey', 'Kristin', 'Lindsay', 'Christine', 'Alicia', 'Vanessa', 'Maria', 'Kathryn', 'Allison', 'Julie', 'Anna', 'Tara', 'Kayla', 'Natalie', 'Victoria', 'Jacqueline', 'Holly', 'Kristina', 'Patricia', 'Cassandra', 'Brandy', 'Whitney', 'Chelsea', 'Brandi', 'Catherine', 'Cynthia', 'Kathleen', 'Veronica', 'Leslie', 'Phoebe', 'Natasha', 'Krystal', 'Stacy', 'Diana', 'Monica', 'Erika', 'Dana', 'Jenna', 'Carrie', 'Leah', 'Melanie', 'Brooke', 'Karen', 'Alexandra', 'Valerie', 'Caitlin', 'Julia', 'Alyssa', 'Jasmine', 'Hannah', 'Stacey', 'Brittney', 'Susan', 'Margaret', 'Sandra', 'Candice', 'Latoya', 'Bethany', 'Misty']);
 	}
 ]);

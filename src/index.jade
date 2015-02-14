@@ -35,11 +35,11 @@ html
 						) #[i(class="fa {{resource.icon}}")] {{resource.text}}
 					div
 						h3 Build
-						button.btn.btn-success.building(
-							ng-repeat='building in buildings',
-							ng-click="build(building)",
-							ng-show='isUnlocked(building.name)'
-						) #[i(class="fa {{building.icon}}")] {{building.text}}
+						button.btn.btn-success.structure(
+							ng-repeat='structure in structures',
+							ng-click="build(structure)",
+							ng-show='isUnlocked(structure.name)'
+						) #[i(class="fa {{structure.icon}}")] {{structure.text}}
 				.col-sm-6
 					h4 Followers
 					ul
@@ -52,7 +52,7 @@ html
 					h4 Plot
 					ul
 						li(ng-repeat='lot in lots')
-							| {{lot.building.name}}: ({{lot.quantity}})
+							| {{lot.structure.name}}: ({{lot.quantity}})
 							a(ng-click='removeStructure(lot)') #[i.fa.fa-times-circle]
 			button.btn.btn-primary(ng-show='!gameStarted' ng-click='startGame()') #[i.fa.fa-play] Start
 			footer.clear
