@@ -3,8 +3,18 @@ thriveApp.factory('HelperFactory', [
 		'use strict';
 
 		return {
+			tasks: [
+				{
+					name: 'idle',
+					icon: 'fa-facebook-square',
+					text: 'Idle'
+				}, {
+					name: 'resourceCollector',
+					resource: null
+				}
+			],
 			//  Let's randomize the 200 most popular first names of the those born in the 1980's for followers
-			followerNames: _.shuffle([
+			workerNames: _.shuffle([
 				'Aaron', 'Adam', 'Alex', 'Alexander', 'Alexandra', 'Alicia', 'Allison', 'Alyssa', 'Amanda',
 				'Amber', 'Amy', 'Andrea', 'Andrew', 'Angela', 'Anna', 'Anthony', 'Antonio', 'April', 'Ashley',
 				'Austin', 'Benjamin', 'Bethany', 'Bradley', 'Brandi', 'Brandon', 'Brandy', 'Brent', 'Brett',

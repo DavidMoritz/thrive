@@ -41,11 +41,12 @@ html
 							ng-show='isUnlocked(structure.name)'
 						) #[i(class="fa {{structure.icon}}")] {{structure.text}}
 				.col-sm-6
-					h4 Followers
+					h4 Workers
 					ul
-						li(ng-repeat='follower in followers')
-							a(ng-class='{followerSelected: isSelected(follower)}' ng-click='toggleFollowerSelection(follower)') {{follower.name}}: ({{follower.task.name}})
-							a(ng-click='removeFollower(follower)') #[i.fa.fa-times-circle]
+						li(ng-repeat='worker in workers')
+							a(ng-class='{workerSelected: isSelected(worker)}' ng-click='toggleWorkerSelection(worker)')
+								| {{worker.name}}: ({{worker.task.displayName()}} #[i.fa(ng-class='worker.task.getIcon()')])
+							a(ng-click='removeWorker(worker)') #[i.fa.fa-times-circle]
 					h4 Supply
 					ul
 						li(ng-repeat='supplyItem in supply') {{supplyItem.resource.name}}: ({{supplyItem.quantity}})
