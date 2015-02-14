@@ -185,19 +185,20 @@ thriveApp.controller('ThriveCtrl', [
 				return;
 			}
 			if ($s.checkAvailabilty() >= building.size) {
-				console.log('this is broken');
 				_.forEach(purchase, function eachPurchase(purchase) {
 					_.findWhere($s.supply, {resource: purchase.resource}).quantity -= purchase.cost;
 				});
 
-				if (!_.findWhere($s.lots, {building: building})) {
+				var buildingCopy = new Structure(angular.copy(building));
+
+				if (!_.findWhere($s.lots, {building: buildingCopy})) {
 					$s.unlocked.push(building.name);
 					$s.lots.push({
 						building: new Structure(building),
 						quantity: 0
 					});
 				}
-				_.findWhere($s.lots, {building: building}).quantity += 1;
+				_.findWhere($s.lots, {building: buildingCopy}).quantity += 1;
 			} else {
 				$s.addMessage('You don\'t have enough room in your plot to build a ' + building.name + '.');
 			}
