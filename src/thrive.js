@@ -186,9 +186,9 @@ thriveApp.controller('ThriveCtrl', [
 			}
 			if ($s.checkAvailabilty() >= building.size) {
 				console.log('this is broken');
-				// _.forEach(purchase, function eachPurchase(purchase) {
-				// 	purchase.resource.quantity -= purchase.cost;
-				// });
+				_.forEach(purchase, function eachPurchase(purchase) {
+					_.findWhere($s.supply, {resource: purchase.resource}).quantity -= purchase.cost;
+				});
 
 				if (!_.findWhere($s.lots, {building: building})) {
 					$s.unlocked.push(building.name);
