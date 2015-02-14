@@ -15,6 +15,8 @@ module.exports = function exportConcat(grunt) {
 					'lib/lodash/lodash.js'
 				],
 				'<%= distPath %>thrive.js': [
+					'src/app.js',
+					'src/services/*.js',
 					'src/*.js'
 				]
 			}
