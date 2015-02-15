@@ -27,7 +27,7 @@ thriveApp.factory('HelperFactory', [
 					icon: 'fa-coffee',
 					text: 'Fetch Water',
 					qtyPerLoad: 5,
-					cooldown: 4000,
+					cooldown: 500,
 					cost: [],
 					unlock: 'food'
 				}),
@@ -36,7 +36,7 @@ thriveApp.factory('HelperFactory', [
 					icon: 'fa-cutlery',
 					text: 'Gather food',
 					qtyPerLoad: 3,
-					cooldown: 2000,
+					cooldown: 500,
 					cost: [],
 					unlock: 'wood'
 				}),
@@ -45,7 +45,7 @@ thriveApp.factory('HelperFactory', [
 					icon: 'fa-tree',
 					text: 'Chop Wood',
 					qtyPerLoad: 2,
-					cooldown: 1000,
+					cooldown: 500,
 					cost: [],
 					unlock: 'hut'
 				}),
@@ -54,7 +54,7 @@ thriveApp.factory('HelperFactory', [
 					icon: 'fa-cloud',
 					text: 'Dig Clay',
 					qtyPerLoad: 2,
-					cooldown: 2000,
+					cooldown: 500,
 					cost: [],
 					unlock: 'smelter'
 				}),
@@ -63,7 +63,7 @@ thriveApp.factory('HelperFactory', [
 					icon: 'fa-pause fa-rotate-90',
 					text: 'Make brick',
 					qtyPerLoad: 1,
-					cooldown: 2000,
+					cooldown: 500,
 					cost: [{
 						name: 'clay',
 						amount: 2
@@ -72,21 +72,6 @@ thriveApp.factory('HelperFactory', [
 						amount: 2
 					}],
 					unlock: 'monument'
-				})
-			],
-
-			locations: [
-				new CLF.Choice({
-					subject: 'location',
-					buttonText: 'Stream (more water)',
-					display: 'Stream',
-					css: ['btn', 'btn-primary']
-				}),
-				new CLF.Choice({
-					subject: 'location',
-					buttonText: 'Forest (more food)',
-					display: 'Forest',
-					css: ['btn', 'btn-success']
 				})
 			],
 
@@ -102,6 +87,7 @@ thriveApp.factory('HelperFactory', [
 						name: 'wood',
 						amount: 10
 					}],
+					priceIncrease: 0.2,
 					unlock: 'clay'
 				}),
 				new CLF.Structure({
@@ -128,7 +114,23 @@ thriveApp.factory('HelperFactory', [
 						name: 'brick',
 						amount: 300
 					}],
+					priceIncrease: 0,
 					unlock: 'win'
+				})
+			],
+
+			locations: [
+				new CLF.Choice({
+					subject: 'location',
+					buttonText: 'Stream (more water)',
+					display: 'Stream',
+					css: ['btn', 'btn-primary']
+				}),
+				new CLF.Choice({
+					subject: 'location',
+					buttonText: 'Forest (more food)',
+					display: 'Forest',
+					css: ['btn', 'btn-success']
 				})
 			],
 

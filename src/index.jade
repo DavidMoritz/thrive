@@ -56,7 +56,7 @@ html
 					ul
 						li(ng-repeat='lot in lots')
 							| {{HF.capitalize(lot.structure.name)}} #[i.fa(ng-class='lot.structure.icon')]: ({{lot.quantity}})
-							a(ng-click='removeStructure(lot)') #[i.fa.fa-times-circle]
+							a(ng-click='removeStructure(lot.structure)') #[i.fa.fa-times-circle]
 			button.btn.btn-primary(ng-show='!gameStarted' ng-click='startGame()') #[i.fa.fa-play] Start
 			footer.clear
 				p Created by David &amp; Jeremy Moritz

@@ -7,7 +7,7 @@ thriveApp.controller('ThriveCtrl', [
 	function ThriveCtrl($s, $interval, $timeout, CLF, HF) {
 		'use strict';
 
-		function getSupplyResource(resourceOrName) {
+		function getSupplyPaletteByResource(resourceOrName) {
 			// this accepts EITHER a resource object OR a resource name
 			var resourceName = _.isObject(resourceOrName) ? resourceOrName.name : resourceOrName;
 			return _.find($s.supply, function findResource(palette) {
@@ -15,12 +15,29 @@ thriveApp.controller('ThriveCtrl', [
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
 		}
 
-		function getLotStructure(structureOrName) {
+		function getLotByStructure(structureOrName) {
 			// this accepts EITHER a structure object OR a structure name
 			var structureName = _.isObject(structureOrName) ? structureOrName.name : structureOrName;
 			return _.find($s.lots, function findStructure(lot) {
 				return lot.structure.name === structureName;
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
+		}
+
+		function getStructurePrice(structure) {
+			var baseStructure = _.findWhere(HF.structures, {name: structure.name});
+			var currentPrice = _.cloneDeep(baseStructure.cost);
+
+			var existingLot = getLotByStructure(structure);
+			if (existingLot) {
+				_.forEach(existingLot.structure.cost, function eachCostItem(costItem) {
+					//	TODO: refactor this with reduce
+					for (var i = 0; i < existingLot.quantity; i++) {
+						var currentPriceResource = _.findWhere(currentPrice, {name: costItem.name});
+						currentPriceResource.amount = Math.round(currentPriceResource.amount * (1 + baseStructure.priceIncrease));
+					}
+				});
+			}
+			return currentPrice;
 		}
 
 		var maxLots = 30;
@@ -83,6 +100,7 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.checkAvailabilty = function checkAvailabilty() {
+			//	TODO: refactor to use _.reduce for style bonus (see other _.reduce function in this file)
 			var cap = _.clone(maxLots);
 			_.forEach($s.lots, function eachLot(lot) {
 				cap -= lot.quantity * lot.structure.size;
@@ -94,18 +112,16 @@ thriveApp.controller('ThriveCtrl', [
 			var available = true;
 			var purchase = [];
 
-			_.forEach(structure.cost, function eachCostItem(costItem) {
-				var supplyResource = getSupplyResource(costItem);
-				if (supplyResource) {
-					if (supplyResource.quantity >= costItem.amount) {
+			_.forEach(getStructurePrice(structure), function eachCostItem(costItem) {
+				var supplyResource = getSupplyPaletteByResource(costItem);
+				if (supplyResource && supplyResource.quantity >= costItem.amount) {
 						purchase.push({
 							resource: supplyResource.resource,
 							cost: costItem.amount
 						});
-					} else {
-						$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + structure.name + '.');
-						available = false;
-					}
+				} else {
+					$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + structure.name + '.');
+					available = false;
 				}
 			});
 			if (!available) {
@@ -113,16 +129,16 @@ thriveApp.controller('ThriveCtrl', [
 			}
 			if ($s.checkAvailabilty() >= structure.size) {
 				_.forEach(purchase, function eachPurchase(purchase) {
-					getSupplyResource(purchase.resource).quantity -= purchase.cost;
+					getSupplyPaletteByResource(purchase.resource).quantity -= purchase.cost;
 				});
 
-				if (!getLotStructure(structure)) {
+				if (!getLotByStructure(structure)) {
 					$s.unlocked.push(structure.unlock);
 					$s.lots.push(new CLF.LotStructure({
 						structure: new CLF.Structure(structure)
 					}));
 				}
-				getLotStructure(structure).quantity += 1;
+				getLotByStructure(structure).quantity += 1;
 			} else {
 				$s.addMessage('You don\'t have enough room in your plot to build a ' + structure.name + '.');
 			}
@@ -158,7 +174,7 @@ thriveApp.controller('ThriveCtrl', [
 			var available = true;
 
 			_.forEach(resource.cost, function eachCostItem(costItem) {
-				var supplyCostItem = getSupplyResource(costItem);
+				var supplyCostItem = getSupplyPaletteByResource(costItem);
 				if (supplyCostItem) {
 					if (supplyCostItem.quantity >= costItem.amount) {
 						supplyCostItem.quantity -= costItem.amount;
@@ -179,7 +195,7 @@ thriveApp.controller('ThriveCtrl', [
 				$s.selectedWorker = null;
 			}
 
-			if (!getSupplyResource(resource)) {
+			if (!getSupplyPaletteByResource(resource)) {
 				$s.supply.push(new CLF.SupplyResource({
 					resource: new CLF.Resource(resource)
 				}));
@@ -189,7 +205,7 @@ thriveApp.controller('ThriveCtrl', [
 				}
 			}
 
-			getSupplyResource(resource).quantity += resource.qtyPerLoad;
+			getSupplyPaletteByResource(resource).quantity += resource.qtyPerLoad;
 
 			if (!auto){
 				$s.coolDown(resource, resource.cooldown);
@@ -219,12 +235,12 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.removeStructure = function removeStructure(structure) {
-			getLotStructure(structure).quantity--;
+			getLotByStructure(structure).quantity--;
 		};
 
 		$s.feed = function feed(worker) {
-			var food = getSupplyResource('food');
-			var water = getSupplyResource('water');
+			var food = getSupplyPaletteByResource('food');
+			var water = getSupplyPaletteByResource('water');
 
 			if (water.quantity && food.quantity) {
 				water.quantity--;
@@ -274,7 +290,9 @@ thriveApp.controller('ThriveCtrl', [
 					display: 'Stream',
 					css: ['btn', 'btn-primary']
 				}),
-				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument']
+				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument'],
+				lots: [],
+				supply: []
 			});
 			_.forEach(HF.resources, function eachResource(resource) {
 				$s.supply.push(new CLF.SupplyResource({

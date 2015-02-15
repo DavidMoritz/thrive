@@ -3,6 +3,7 @@ thriveApp.factory('ClassLibFactory', [
 		'use strict';
 
 		var defaultCooldownTime = 5000;
+		var defaultPriceIncrease = 0.1;
 		var CLF = this;
 		_.assign(CLF, {
 			Task: function Task(options) {
@@ -68,7 +69,8 @@ thriveApp.factory('ClassLibFactory', [
 
 			Structure: function Structure(structureOptions) {
 				_.merge(this, {
-					cooldown: defaultCooldownTime
+					cooldown: defaultCooldownTime,
+					priceIncrease: defaultPriceIncrease
 				}, _.pick(structureOptions, [
 					'name',
 					'text',
@@ -77,6 +79,7 @@ thriveApp.factory('ClassLibFactory', [
 					'capacity',
 					'cooldown',
 					'cost',
+					'priceIncrease',
 					'unlock'
 				]));
 			},
