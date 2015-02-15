@@ -174,7 +174,7 @@ thriveApp.controller('ThriveCtrl', [
 				return;
 			}
 
-			if ($s.selectedWorker) {
+			if ($s.selectedWorker && !auto) {
 				$s.selectedWorker.assignTask(resource);
 				$s.selectedWorker = null;
 			}
@@ -222,7 +222,7 @@ thriveApp.controller('ThriveCtrl', [
 			getLotStructure(structure).quantity--;
 		};
 
-		$s.eat = function eat(worker) {
+		$s.feed = function feed(worker) {
 			var food = getSupplyResource('food');
 			var water = getSupplyResource('water');
 
@@ -239,122 +239,27 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$interval(function clickTicks() {
-			var capacity = 0;
 			$s.workers.forEach(function eachWorker(worker) {
-				if (worker.task.name === 'resourceCollector') {
+				if (worker.task.resource) {
 					$s.addToSupply(worker.task.resource, true);
-					// I'd rather 'eat' be a worker method, but I don't know how
-					$s.eat(worker);
+					// I'd rather 'feed' be a worker method, but I don't know how
+					$s.feed(worker);
 				}
 			});
-			_.forEach($s.lots, function eachLot(lot) {
-				capacity += lot.structure.capacity * lot.quantity;
-			});
-			if (capacity > $s.workers.length) {
+
+			var workerCapacity = _.reduce($s.lots, function calculateCapacity(workerCapacity, lot) {
+				return workerCapacity + (lot.structure.capacity * lot.quantity);
+			}, 0);
+
+			if (workerCapacity > $s.workers.length) {
 				$s.addWorker();
-			} else if (capacity < $s.workers.length) {
+			} else if (workerCapacity < $s.workers.length) {
 				$s.removeWorker( $s.pickWorker() );
 			}
 			if (!_.contains($s.unlocked, 'win')) {
 				$s.turns++;
 			}
 		}, HF.defaultCooldownTime, $s.turns);
-
-		$s.resources = [
-			new CLF.Resource({
-				name: 'water',
-				icon: 'fa-coffee',
-				text: 'Fetch Water',
-				qtyPerLoad: 5,
-				cooldown: 4000,
-				cost: [],
-				unlock: 'food'
-			}),
-			new CLF.Resource({
-				name: 'food',
-				icon: 'fa-cutlery',
-				text: 'Gather food',
-				qtyPerLoad: 3,
-				cooldown: 2000,
-				cost: [],
-				unlock: 'wood'
-			}),
-			new CLF.Resource({
-				name: 'wood',
-				icon: 'fa-tree',
-				text: 'Chop Wood',
-				qtyPerLoad: 2,
-				cooldown: 1000,
-				cost: [],
-				unlock: 'hut'
-			}),
-			new CLF.Resource({
-				name: 'clay',
-				icon: 'fa-cloud',
-				text: 'Dig Clay',
-				qtyPerLoad: 2,
-				cooldown: 2000,
-				cost: [],
-				unlock: 'smelter'
-			}),
-			new CLF.Resource({
-				name: 'brick',
-				icon: 'fa-pause fa-rotate-90',
-				text: 'Make brick',
-				qtyPerLoad: 1,
-				cooldown: 2000,
-				cost: [{
-					name: 'clay',
-					amount: 2
-				}, {
-					name: 'wood',
-					amount: 2
-				}],
-				unlock: 'monument'
-			})
-		];
-
-		$s.structures = [
-			new CLF.Structure({
-				name: 'hut',
-				text: 'Build Hut',
-				icon: 'fa-home',
-				size: 1,
-				cooldown: 2000,
-				capacity: 1,
-				cost: [{
-					name: 'wood',
-					amount: 10
-				}],
-				unlock: 'clay'
-			}),
-			new CLF.Structure({
-				name: 'smelter',
-				text: 'Build Smelter',
-				icon: 'fa-building-o',
-				size: 2,
-				cooldown: 2000,
-				capacity: 0,
-				cost: [{
-					name: 'clay',
-					amount: 100
-				}],
-				unlock: 'brick'
-			}),
-			new CLF.Structure({
-				name: 'monument',
-				text: 'Build Monument',
-				icon: 'fa-male',
-				size: 10,
-				cooldown: 2000,
-				capacity: 0,
-				cost: [{
-					name: 'brick',
-					amount: 300
-				}],
-				unlock: 'win'
-			})
-		];
 
 		$s.isUnlocked = function isUnlocked(valueToCheck) {
 			return _.contains($s.unlocked, valueToCheck);
@@ -371,13 +276,13 @@ thriveApp.controller('ThriveCtrl', [
 				}),
 				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument']
 			});
-			_.forEach($s.resources, function eachResource(resource) {
+			_.forEach(HF.resources, function eachResource(resource) {
 				$s.supply.push(new CLF.SupplyResource({
 					resource: new CLF.Resource(resource),
 					quantity: 100
 				}));
 			});
-			_.forEach($s.structures, function eachStructure(structure) {
+			_.forEach(HF.structures, function eachStructure(structure) {
 				if (structure.name !== 'monument') {
 					$s.lots.push(new CLF.LotStructure({
 						structure: new CLF.Structure(structure),

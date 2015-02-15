@@ -18,7 +18,7 @@ html
 				h1 Thrive!
 			.jumbotron
 				h2 {{display.text}}
-				button.btn.btn-default(ng-show='display.next', ng-click='nextMessage()') Next
+				button.btn.btn-default(ng-show='display.next', ng-click='nextMessage()') Next #[i.fa.fa-chevron-right]
 				.choices(ng-show='!display.next')
 					ul
 						li(ng-repeat='choice in display.choices')
@@ -30,7 +30,7 @@ html
 					div
 						h3 Get More Resources
 						button.btn.btn-primary.resource(
-							ng-repeat='resource in resources',
+							ng-repeat='resource in HF.resources',
 							ng-click="addToSupply(resource)",
 							ng-disabled='!readyToWork',
 							ng-show='isUnlocked(resource.name)'
@@ -38,7 +38,7 @@ html
 					div
 						h3 Build
 						button.btn.btn-success.structure(
-							ng-repeat='structure in structures',
+							ng-repeat='structure in HF.structures',
 							ng-click="build(structure)",
 							ng-show='isUnlocked(structure.name)'
 						) #[i(class="fa {{structure.icon}}")] {{structure.text}}
