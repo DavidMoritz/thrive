@@ -117,7 +117,7 @@ thriveApp.controller('ThriveCtrl', [
 				});
 
 				if (!getLotStructure(structure)) {
-					$s.unlocked.push(structure.name);
+					$s.unlocked.push(structure.unlock);
 					$s.lots.push(new CLF.LotStructure({
 						structure: new CLF.Structure(structure)
 					}));
