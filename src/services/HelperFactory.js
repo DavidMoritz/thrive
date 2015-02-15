@@ -3,6 +3,9 @@ thriveApp.factory('HelperFactory', [
 		'use strict';
 
 		return {
+			capitalize: function capitalize(string, keepOtherCapitalization) {
+				return string.charAt(0).toUpperCase() + (keepOtherCapitalization ? string.slice(1) : string.slice(1).toLowerCase());
+			},
 			tasks: [
 				{
 					name: 'idle',

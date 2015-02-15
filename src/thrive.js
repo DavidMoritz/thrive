@@ -96,8 +96,8 @@ thriveApp.controller('ThriveCtrl', [
 		function getSupplyResource(resourceOrName) {
 			// this accepts EITHER a resource object OR a resource name
 			var resourceName = _.isObject(resourceOrName) ? resourceOrName.name : resourceOrName;
-			return _.find($s.supply, function findResource(supplyItem) {
-				return supplyItem.resource.name === resourceName;
+			return _.find($s.supply, function findResource(palette) {
+				return palette.resource.name === resourceName;
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
 		}
 
@@ -127,7 +127,8 @@ thriveApp.controller('ThriveCtrl', [
 			selectedWorker: null,
 			location: null,
 			gameStarted: false,
-			readyToWork: true
+			readyToWork: true,
+			HF: HelperFactory
 		});
 		$s.display = _.cloneDeep($s.defaultDisplay);
 		$s.messages.push($s.defaultDisplay);

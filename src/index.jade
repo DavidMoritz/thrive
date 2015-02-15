@@ -1,3 +1,5 @@
+include mixins
+
 doctype html
 html
 	head
@@ -49,11 +51,11 @@ html
 							a(ng-click='removeWorker(worker)') #[i.fa.fa-times-circle]
 					h4 Supply
 					ul
-						li(ng-repeat='supplyItem in supply') {{supplyItem.resource.name}}: ({{supplyItem.quantity}})
+						li(ng-repeat='palette in supply') {{HF.capitalize(palette.resource.name)}} #[i.fa(ng-class='palette.resource.icon')]: ({{palette.quantity}})
 					h4 Plot
 					ul
 						li(ng-repeat='lot in lots')
-							| {{lot.structure.name}}: ({{lot.quantity}})
+							| {{HF.capitalize(lot.structure.name)}}: ({{lot.quantity}})
 							a(ng-click='removeStructure(lot)') #[i.fa.fa-times-circle]
 			button.btn.btn-primary(ng-show='!gameStarted' ng-click='startGame()') #[i.fa.fa-play] Start
 			footer.clear
