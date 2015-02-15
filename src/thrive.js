@@ -2,96 +2,10 @@ thriveApp.controller('ThriveCtrl', [
 	'$scope',
 	'$interval',
 	'$timeout',
+	'ClassLibFactory',
 	'HelperFactory',
-	function ThriveCtrl($s, $interval, $timeout, HelperFactory) {
+	function ThriveCtrl($s, $interval, $timeout, CLF, HF) {
 		'use strict';
-
-		function Task(options) {
-			var idleTask = {
-				name: 'idle',
-				icon: 'fa-facebook-square',
-				text: 'Idle'
-			};
-
-			var self = _.merge(this, options || idleTask);
-
-			self.displayName = function displayName() {
-				return self.resource ? self.resource.text : self.text;
-			};
-
-			self.getIcon = function getIcon() {
-				return self.resource ? self.resource.icon : self.icon;
-			};
-		}
-
-		function Worker(name) {
-			var self = _.merge(this, {
-				name: name,
-				task: new Task(null),
-				strength: 1
-			});
-
-			self.assignTask = function assignTask(resource) {
-				self.task = new Task(_.isObject(resource) ? {
-					name: 'resourceCollector',
-					resource: resource
-				} : null);
-			};
-		}
-
-		function SupplyResource(options) {
-			_.merge(this, {
-				quantity: options.quantity || 0,
-				resource: new Resource(options.resource)	//	pass in object with resource parameter
-			});
-		}
-
-		function LotStructure(options) {
-			_.merge(this, {
-				quantity: options.quantity || 0,
-				structure: new Structure(options.structure)
-			});
-		}
-
-		function Resource(resourceOptions) {
-			_.merge(this, {
-				cooldown: defaultCooldownTime
-			}, _.pick(resourceOptions, [
-				'name',
-				'text',
-				'icon',
-				'qtyPerLoad',
-				'cooldown',
-				'cost',
-				'unlock'
-			]));
-		}
-
-		function Structure(structureOptions) {
-			_.merge(this, {
-				cooldown: defaultCooldownTime
-			}, _.pick(structureOptions, [
-				'name',
-				'text',
-				'icon',
-				'size',
-				'capacity',
-				'cooldown',
-				'cost',
-				'unlock'
-			]));
-		}
-
-		function Choice(choiceOptions) {
-			_.merge(this, {
-				css: ['btn', 'btn-default']
-			}, _.pick(choiceOptions, [
-				'subject',
-				'buttonText',
-				'display',
-				'css'
-			]));
-		}
 
 		function getSupplyResource(resourceOrName) {
 			// this accepts EITHER a resource object OR a resource name
@@ -109,7 +23,6 @@ thriveApp.controller('ThriveCtrl', [
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
 		}
 
-		var defaultCooldownTime = 5000;
 		var maxLots = 30;
 
 		//	initialize scoped variables
@@ -128,7 +41,7 @@ thriveApp.controller('ThriveCtrl', [
 			location: null,
 			gameStarted: false,
 			readyToWork: true,
-			HF: HelperFactory
+			HF: HF	//	now we can use it in the view
 		});
 		$s.display = _.cloneDeep($s.defaultDisplay);
 		$s.messages.push($s.defaultDisplay);
@@ -140,17 +53,7 @@ thriveApp.controller('ThriveCtrl', [
 			$s.addMessage('and filthy pond water.');
 			$s.addMessage('This is no way to survive.');
 			$s.addMessage('You want to thrive!');
-			$s.addMessage('Which is a better place to stop?', [{
-				subject: 'location',
-				buttonText: 'Stream (plenty of water)',
-				display: 'Stream',
-				css: ['btn', 'btn-primary']
-			}, {
-				subject: 'location',
-				buttonText: 'Forest (plenty of wood)',
-				display: 'Forest',
-				css: ['btn', 'btn-success']
-			}]);
+			$s.addMessage('Which is a better place to stop?', locations);
 		};
 
 		$s.addMessage = function addMessage(text, choices) {
@@ -215,8 +118,8 @@ thriveApp.controller('ThriveCtrl', [
 
 				if (!getLotStructure(structure)) {
 					$s.unlocked.push(structure.name);
-					$s.lots.push(new LotStructure({
-						structure: new Structure(structure)
+					$s.lots.push(new CLF.LotStructure({
+						structure: new CLF.Structure(structure)
 					}));
 				}
 				getLotStructure(structure).quantity += 1;
@@ -239,7 +142,7 @@ thriveApp.controller('ThriveCtrl', [
 			$s.readyToWork = false;
 			$timeout(function readyToWorkAgain() {
 				$s.readyToWork = true;
-			}, time || defaultCooldownTime);
+			}, time || HF.defaultCooldownTime);
 		};
 
 		$s.toggleWorkerSelection = function toggleWorkerSelection(worker) {
@@ -247,8 +150,8 @@ thriveApp.controller('ThriveCtrl', [
 		};
 
 		$s.addWorker = function addWorker() {
-			var name = HelperFactory.workerNames.shift();
-			$s.workers.push( new Worker(name) );
+			var name = HF.workerNames.shift();
+			$s.workers.push( new CLF.Worker(name) );
 		};
 
 		$s.addToSupply = function addToSupply(resource, auto) {
@@ -277,8 +180,8 @@ thriveApp.controller('ThriveCtrl', [
 			}
 
 			if (!getSupplyResource(resource)) {
-				$s.supply.push(new SupplyResource({
-					resource: new Resource(resource)
+				$s.supply.push(new CLF.SupplyResource({
+					resource: new CLF.Resource(resource)
 				}));
 
 				if (resource.unlock) {
@@ -295,7 +198,7 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.pickWorker = function pickWorker() {
 			var idleWorker = _.find($s.workers, function findIdleWorkers(worker) {
-				return worker.task.name = 'idle';
+				return worker.task.name === 'idle';
 			});
 			if (idleWorker) {
 				return idleWorker;
@@ -355,10 +258,10 @@ thriveApp.controller('ThriveCtrl', [
 			if (!_.contains($s.unlocked, 'win')) {
 				$s.turns++;
 			}
-		}, defaultCooldownTime, $s.turns);
+		}, HF.defaultCooldownTime, $s.turns);
 
 		$s.resources = [
-			new Resource({
+			new CLF.Resource({
 				name: 'water',
 				icon: 'fa-coffee',
 				text: 'Fetch Water',
@@ -367,7 +270,7 @@ thriveApp.controller('ThriveCtrl', [
 				cost: [],
 				unlock: 'food'
 			}),
-			new Resource({
+			new CLF.Resource({
 				name: 'food',
 				icon: 'fa-cutlery',
 				text: 'Gather food',
@@ -376,7 +279,7 @@ thriveApp.controller('ThriveCtrl', [
 				cost: [],
 				unlock: 'wood'
 			}),
-			new Resource({
+			new CLF.Resource({
 				name: 'wood',
 				icon: 'fa-tree',
 				text: 'Chop Wood',
@@ -385,7 +288,7 @@ thriveApp.controller('ThriveCtrl', [
 				cost: [],
 				unlock: 'hut'
 			}),
-			new Resource({
+			new CLF.Resource({
 				name: 'clay',
 				icon: 'fa-cloud',
 				text: 'Dig Clay',
@@ -394,7 +297,7 @@ thriveApp.controller('ThriveCtrl', [
 				cost: [],
 				unlock: 'smelter'
 			}),
-			new Resource({
+			new CLF.Resource({
 				name: 'brick',
 				icon: 'fa-pause fa-rotate-90',
 				text: 'Make brick',
@@ -412,7 +315,7 @@ thriveApp.controller('ThriveCtrl', [
 		];
 
 		$s.structures = [
-			new Structure({
+			new CLF.Structure({
 				name: 'hut',
 				text: 'Build Hut',
 				icon: 'fa-home',
@@ -425,7 +328,7 @@ thriveApp.controller('ThriveCtrl', [
 				}],
 				unlock: 'clay'
 			}),
-			new Structure({
+			new CLF.Structure({
 				name: 'smelter',
 				text: 'Build Smelter',
 				icon: 'fa-building-o',
@@ -438,7 +341,7 @@ thriveApp.controller('ThriveCtrl', [
 				}],
 				unlock: 'brick'
 			}),
-			new Structure({
+			new CLF.Structure({
 				name: 'monument',
 				text: 'Build Monument',
 				icon: 'fa-male',
@@ -453,21 +356,6 @@ thriveApp.controller('ThriveCtrl', [
 			})
 		];
 
-		var locations = [
-			new Choice({
-				subject: 'location',
-				buttonText: 'Stream (more water)',
-				display: 'Stream',
-				css: ['btn', 'btn-primary']
-			}),
-			new Choice({
-				subject: 'location',
-				buttonText: 'Forest (more food)',
-				display: 'Forest',
-				css: ['btn', 'btn-success']
-			})
-		];
-
 		$s.isUnlocked = function isUnlocked(valueToCheck) {
 			return _.contains($s.unlocked, valueToCheck);
 		};
@@ -475,7 +363,7 @@ thriveApp.controller('ThriveCtrl', [
 		$s.skipToMiddle = function skipToMiddle() {
 			_.assign($s, {
 				gameStarted: true,
-				location: new Choice({
+				location: new CLF.Choice({
 					subject: 'location',
 					buttonText: 'Stream (more water)',
 					display: 'Stream',
@@ -484,15 +372,15 @@ thriveApp.controller('ThriveCtrl', [
 				unlocked: ['water', 'food', 'wood', 'clay', 'brick', 'hut', 'smelter', 'monument']
 			});
 			_.forEach($s.resources, function eachResource(resource) {
-				$s.supply.push(new SupplyResource({
-					resource: new Resource(resource),
+				$s.supply.push(new CLF.SupplyResource({
+					resource: new CLF.Resource(resource),
 					quantity: 100
 				}));
 			});
 			_.forEach($s.structures, function eachStructure(structure) {
 				if (structure.name !== 'monument') {
-					$s.lots.push(new LotStructure({
-						structure: new Structure(structure),
+					$s.lots.push(new CLF.LotStructure({
+						structure: new CLF.Structure(structure),
 						quantity: 7
 					}));
 				}

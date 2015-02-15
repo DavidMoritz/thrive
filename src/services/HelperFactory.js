@@ -1,8 +1,10 @@
 thriveApp.factory('HelperFactory', [
-	function HelperFactory() {
+	'ClassLibFactory',
+	function HelperFactory(CLF) {
 		'use strict';
 
 		return {
+			defaultCooldownTime: 5000,
 			capitalize: function capitalize(string, keepOtherCapitalization) {
 				return string.charAt(0).toUpperCase() + (keepOtherCapitalization ? string.slice(1) : string.slice(1).toLowerCase());
 			},
@@ -15,6 +17,20 @@ thriveApp.factory('HelperFactory', [
 					name: 'resourceCollector',
 					resource: null
 				}
+			],
+			locations: [
+				new CLF.Choice({
+					subject: 'location',
+					buttonText: 'Stream (more water)',
+					display: 'Stream',
+					css: ['btn', 'btn-primary']
+				}),
+				new CLF.Choice({
+					subject: 'location',
+					buttonText: 'Forest (more food)',
+					display: 'Forest',
+					css: ['btn', 'btn-success']
+				})
 			],
 			//  Let's randomize the 200 most popular first names of the those born in the 1980's for followers
 			workerNames: _.shuffle([
