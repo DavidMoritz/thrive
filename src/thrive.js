@@ -53,7 +53,7 @@ thriveApp.controller('ThriveCtrl', [
 			$s.addMessage('and filthy pond water.');
 			$s.addMessage('This is no way to survive.');
 			$s.addMessage('You want to thrive!');
-			$s.addMessage('Which is a better place to stop?', locations);
+			$s.addMessage('Which is a better place to stop?', HF.locations);
 		};
 
 		$s.addMessage = function addMessage(text, choices) {
