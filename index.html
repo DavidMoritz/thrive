@@ -11,59 +11,59 @@
     <script src="inc/angular.js"></script>
   </head>
   <body ng-app="thriveApp" ng-controller="ThriveCtrl">
-    <div ng-show="!unlocked.win" class="container">
+    <div ng-if="!isUnlocked(&quot;win&quot;)" class="container">
       <header class="hide">
         <h1>Thrive!</h1>
       </header>
       <div class="jumbotron">
         <h2>{{display.text}}</h2>
-        <button ng-show="display.next" ng-click="nextMessage()" class="btn btn-default">Next</button>
+        <button ng-show="display.next" ng-click="nextMessage()" class="btn btn-default">Next <i class="fa fa-chevron-right"></i></button>
         <div ng-show="!display.next" class="choices">
           <ul>
             <li ng-repeat="choice in display.choices">
-              <button ng-click="makeChoice(choice.choose)" ng-class="choice.class">{{choice.text}}</button>
+              <button ng-click="makeChoice(choice)" ng-class="choice.css.join(&quot; &quot;)">{{choice.buttonText}}</button>
             </li>
           </ul>
         </div>
       </div>
-      <div ng-show="!choice" class="row mainLayout">
+      <div ng-if="location &amp;&amp; !decisionToMake" class="row mainLayout">
         <div class="col-sm-6">
           <div>
-            <h3>Location: {{location}}</h3>
+            <h3>Location: {{location.display}}</h3>
           </div>
           <div>
-            <h3>Add New Resource</h3>
-            <button ng-repeat="resource in resourceTypes" ng-click="addToSupply(resource.name)" ng-disabled="pause[resource.name]" ng-show="unlocked[resource.name]" class="btn btn-primary resource"><i class="fa {{resource.icon}}"></i> {{resource.text}}</button>
+            <h3>Get More Resources</h3>
+            <button ng-repeat="resource in HF.resources" ng-click="addToSupply(resource)" ng-disabled="!readyToWork" ng-show="isUnlocked(resource.name)" class="btn btn-primary resource"><i class="fa {{resource.icon}}"></i> {{resource.text}}</button>
           </div>
           <div>
             <h3>Build</h3>
-            <button ng-repeat="building in buildingTypes" ng-click="build(building.name)" ng-show="unlocked[building.name]" class="btn btn-success building"><i class="fa {{building.icon}}"></i> {{building.text}}</button>
+            <button ng-repeat="structure in HF.structures" ng-click="build(structure)" ng-show="isUnlocked(structure.name)" class="btn btn-success structure"><i class="fa {{structure.icon}}"></i> {{structure.text}}</button>
           </div>
         </div>
         <div class="col-sm-6">
-          <h4>Followers</h4>
+          <h4>Workers</h4>
           <ul>
-            <li ng-repeat="follower in followers"><a ng-class="{followerSelected: isSelected(follower)}" ng-click="toggleFollowerSelection(follower)">{{follower.name}}: ({{follower.task.name}})</a><a ng-click="removeFollower(follower)"><i class="fa fa-times-circle"></i></a></li>
+            <li ng-repeat="worker in workers"><a ng-class="{workerSelected: isSelected(worker)}" ng-click="toggleWorkerSelection(worker)">{{worker.name}}: ({{worker.task.displayName()}} <i ng-class="worker.task.getIcon()" class="fa"></i>)</a><a ng-click="removeWorker(worker)"><i class="fa fa-times-circle"></i></a></li>
           </ul>
           <h4>Supply</h4>
           <ul>
-            <li ng-repeat="resource in supply">{{resource.type}}: ({{resource.quantity}})</li>
+            <li ng-repeat="palette in supply">{{HF.capitalize(palette.resource.name)}} <i ng-class="palette.resource.icon" class="fa"></i>: ({{palette.quantity}})</li>
           </ul>
           <h4>Plot</h4>
           <ul>
-            <li ng-repeat="lot in plot">{{lot.type}}: ({{lot.quantity}})<a ng-click="removeStructure(lot.type)"><i class="fa fa-times-circle"></i></a></li>
+            <li ng-repeat="lot in lots">{{HF.capitalize(lot.structure.name)}} <i ng-class="lot.structure.icon" class="fa"></i>: ({{lot.quantity}})<a ng-click="removeStructure(lot.structure)"><i class="fa fa-times-circle"></i></a></li>
           </ul>
         </div>
       </div>
-      <button ng-show="!gameStart" ng-click="startGame()" class="btn btn-primary"><i class="fa fa-play"></i> Start</button>
+      <button ng-show="!gameStarted" ng-click="startGame()" class="btn btn-primary"><i class="fa fa-play"></i> Start</button>
       <footer class="clear">
-        <p>Created by David Moritz</p>
+        <p>Created by David &amp; Jeremy Moritz</p>
       </footer>
     </div>
-    <div ng-show="unlocked.win">
+    <div ng-if="isUnlocked(&quot;win&quot;)" class="container">
       <div class="jumbotron">
-        <h1>Congratulations! You built a monument!</h1>
-        <h4>It only took you {{minutes}} minutes.</h4>
+        <h1>Congratulations! You built a monument to your success!</h1>
+        <h4>It only took you {{turns / 20}} minutes.</h4>
       </div>
     </div><script src="inc/lib.js"></script><script src="inc/thrive.js"></script>
   </body>

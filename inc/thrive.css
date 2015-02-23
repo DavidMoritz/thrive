@@ -5365,23 +5365,23 @@ summary {
   cursor: pointer;
 }input {
   color: black;
-}.followerSelected {
+}.workerSelected {
   font-weight: bold;
   color: black;
 }.resource,
-.building {
+.structure {
   margin-right: 5px;
 }.choices ul {
   list-style-type: none;
-}.choices li {
+}.choices ul li {
   display: inline-block;
   float: left;
   margin-right: 20px;
-}.container h3 {
-  margin-top: 0;
 }.container h2 {
   color: black;
   text-shadow: white 0 0 2px;
+}.container h3 {
+  margin-top: 0;
 }/* STYLE CLASSES (ALL PAGES) */.hide {
   display: none;
 }.center {
