@@ -10,6 +10,7 @@ thriveApp.controller('ThriveCtrl', [
 		function getSupplyPaletteByResource(resourceOrName) {
 			// this accepts EITHER a resource object OR a resource name
 			var resourceName = _.isObject(resourceOrName) ? resourceOrName.name : resourceOrName;
+
 			return _.find($s.supply, function findResource(palette) {
 				return palette.resource.name === resourceName;
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
@@ -18,6 +19,7 @@ thriveApp.controller('ThriveCtrl', [
 		function getLotByStructure(structureOrName) {
 			// this accepts EITHER a structure object OR a structure name
 			var structureName = _.isObject(structureOrName) ? structureOrName.name : structureOrName;
+
 			return _.find($s.lots, function findStructure(lot) {
 				return lot.structure.name === structureName;
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
@@ -26,8 +28,8 @@ thriveApp.controller('ThriveCtrl', [
 		function getStructurePrice(structure) {
 			var baseStructure = _.findWhere(HF.structures, {name: structure.name});
 			var currentPrice = _.cloneDeep(baseStructure.cost);
-
 			var existingLot = getLotByStructure(structure);
+
 			if (existingLot) {
 				_.forEach(existingLot.structure.cost, function eachCostItem(costItem) {
 					//	TODO: refactor this with reduce
@@ -37,6 +39,7 @@ thriveApp.controller('ThriveCtrl', [
 					}
 				});
 			}
+
 			return currentPrice;
 		}
 
@@ -81,9 +84,11 @@ thriveApp.controller('ThriveCtrl', [
 				next: next,
 				choices: choices
 			};
-			if(!_.findWhere($s.messages, message)) {
+
+			if (!_.findWhere($s.messages, message)) {
 				$s.messages.push(message);
 			}
+
 			if (check) {
 				$s.nextMessage();
 			}
@@ -92,8 +97,8 @@ thriveApp.controller('ThriveCtrl', [
 		$s.makeChoice = function makeChoice(choice) {
 			switch (choice.subject) {
 				case 'location':
-				   $s.location = choice;
-				   break;
+					$s.location = choice;
+				break;
 			}
 			$s.nextMessage();
 			$s.decisionToMake = null;
@@ -105,6 +110,7 @@ thriveApp.controller('ThriveCtrl', [
 			_.forEach($s.lots, function eachLot(lot) {
 				cap -= lot.quantity * lot.structure.size;
 			});
+
 			return cap;
 		};
 
@@ -114,19 +120,22 @@ thriveApp.controller('ThriveCtrl', [
 
 			_.forEach(getStructurePrice(structure), function eachCostItem(costItem) {
 				var supplyResource = getSupplyPaletteByResource(costItem);
+
 				if (supplyResource && supplyResource.quantity >= costItem.amount) {
-						purchase.push({
-							resource: supplyResource.resource,
-							cost: costItem.amount
-						});
+					purchase.push({
+						resource: supplyResource.resource,
+						cost: costItem.amount
+					});
 				} else {
 					$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + structure.name + '.');
 					available = false;
 				}
 			});
+
 			if (!available) {
 				return;
 			}
+
 			if ($s.checkAvailabilty() >= structure.size) {
 				_.forEach(purchase, function eachPurchase(purchase) {
 					getSupplyPaletteByResource(purchase.resource).quantity -= purchase.cost;
@@ -146,6 +155,7 @@ thriveApp.controller('ThriveCtrl', [
 
 		$s.nextMessage = function nextMessage() {
 			$s.messagelog.push($s.messages.shift());
+
 			if ($s.messages.length) {
 				$s.display = $s.messages[0];
 			} else {
@@ -175,12 +185,14 @@ thriveApp.controller('ThriveCtrl', [
 
 			_.forEach(resource.cost, function eachCostItem(costItem) {
 				var supplyCostItem = getSupplyPaletteByResource(costItem);
+
 				if (supplyCostItem) {
 					if (supplyCostItem.quantity >= costItem.amount) {
 						supplyCostItem.quantity -= costItem.amount;
 					} else {
 						$s.addMessage('You need at least ' + costItem.amount + ' ' + costItem.name + ' to make a ' + resource.name + '.');
 						available = false;
+
 						return false;
 					}
 				}
@@ -207,7 +219,7 @@ thriveApp.controller('ThriveCtrl', [
 
 			getSupplyPaletteByResource(resource).quantity += resource.qtyPerLoad;
 
-			if (!auto){
+			if (!auto) {
 				$s.coolDown(resource, resource.cooldown);
 			}
 		};
@@ -216,20 +228,22 @@ thriveApp.controller('ThriveCtrl', [
 			var idleWorker = _.find($s.workers, function findIdleWorkers(worker) {
 				return worker.task.name === 'idle';
 			});
+
 			if (idleWorker) {
 				return idleWorker;
 			}
 			var groups = _.groupBy($s.workers, function eachWorker(worker) {
 				return worker.task.name;
 			});
-			groups = _.sortBy(groups, function(group) {
+			groups = _.sortBy(groups, function sortGroups(group) {
 				return (group.length * -1);
 			});
+
 			return groups[0][0];
 		};
 
 		$s.removeWorker = function removeWorker(removedWorker) {
-			_.remove($s.workers, function(eachWorker) {
+			_.remove($s.workers, function checkWorker(eachWorker) {
 				return eachWorker == removedWorker;
 			});
 		};
@@ -272,6 +286,7 @@ thriveApp.controller('ThriveCtrl', [
 			} else if (workerCapacity < $s.workers.length) {
 				$s.removeWorker( $s.pickWorker() );
 			}
+
 			if (!_.contains($s.unlocked, 'win')) {
 				$s.turns++;
 			}

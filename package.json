@@ -31,6 +31,7 @@
     "grunt-phonegap": "~0.15.2",
     "grunt-pleeease": "~0.0.5",
     "grunt-replace": "~0.7.7",
+    "grunt-jscs": "^1.5.0",
     "jshint-stylish": "~0.2.0"
   }
 }
