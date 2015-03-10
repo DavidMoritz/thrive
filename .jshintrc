@@ -3,5 +3,9 @@
   "camelcase": true,
   "newcap": true,
   "quotmark": "single",
-  "browser": true
+  "browser": true,
+  "maxstatements": 10,
+  //"maxparams": 3,
+  "maxdepth": 3,
+  "maxcomplexity":10
 }

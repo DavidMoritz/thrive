@@ -7,32 +7,31 @@ module.exports = function(grunt) {
 
 	// Define other properties of the config object
 	// Define the root directory for distribution
-	var distRoot = 'dist';
+	var distRoot = 'dist',
 	// Build main distribution path. NOTE: There is no slash at the end
-	var distPath = distRoot + '/inc/';
+		distPath = distRoot + '/inc/',
+	// Define banner for css and js files
+		banner = '/*!\n' +
+		' * <%= pkg.description %> - v<%= pkg.version %> \n' +
+		' * Build Date: <%= grunt.template.today("yyyy.mm.dd") %> \n' +
+		' * Docs: <%= pkg.homepage %> \n' +
+		' * Coded @ <%= pkg.author %> \n' +
+		' */ \n \n';
+
 	// Set distribution path to grunt config object
 	// This should be used when defining output files
 	// Access this config option using <%= distRoot %>
 	grunt.config.set('distRoot', distRoot);
 	// Access this config option using <%= distPath %>
 	grunt.config.set('distPath', distPath);
-
-	// Define banner for css and js files
-	var banner = '/*!\n' +
-		' * <%= pkg.description %> - v<%= pkg.version %> \n' +
-		' * Build Date: <%= grunt.template.today("yyyy.mm.dd") %> \n' +
-		' * Docs: <%= pkg.homepage %> \n' +
-		' * Coded @ <%= pkg.author %> \n' +
-		' */ \n \n';
   // Access this config option using <%= banner %>
 	grunt.config.set('banner', banner);
 
 	// Load Grunt plugins from the config files in the grunt/ directory
 	grunt.loadTasks('grunt');
 
-	// Register task for developing locally
-	// Runs all of the dev task plus runs watch
-	grunt.registerTask('dev-local', [
+	// default is just dev
+	grunt.registerTask('default', [
 		'dev',
 		'watch'
 	]);
@@ -67,11 +66,5 @@ module.exports = function(grunt) {
 		'pleeease:prod',
 		'concat:prod',
 		'uglify'
-	]);
-
-	// default is just dev
-	grunt.registerTask('default', [
-		'dev',
-		'watch'
 	]);
 };
