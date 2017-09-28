@@ -21,7 +21,7 @@
         <div ng-show="!display.next" class="choices">
           <ul>
             <li ng-repeat="choice in display.choices">
-              <button ng-click="makeChoice(choice)" ng-class="choice.css.join(&quot; &quot;)">{{choice.buttonText}} <span class="badge">7</span></button>
+              <button ng-click="makeChoice(choice)" ng-class="choice.css.join(&quot; &quot;)">{{choice.buttonText}}</button>
             </li>
           </ul>
         </div>
@@ -37,7 +37,7 @@
           </div>
           <div>
             <h3>Build</h3>
-            <button ng-repeat="structure in HF.structures" ng-click="build(structure)" ng-show="isUnlocked(structure.name)" class="btn btn-success structure"><i class="fa {{structure.icon}}"></i> {{structure.text}}</button>
+            <button ng-repeat="structure in HF.structures" ng-click="build(structure)" ng-show="isUnlocked(structure.name)" class="btn btn-success structure"><i class="fa {{structure.icon}}"></i> {{structure.text}} <span class="badge">{{getStructurePrice(structure)}}</span></button>
           </div>
         </div>
         <div class="col-sm-6">
