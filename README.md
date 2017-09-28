@@ -2,6 +2,7 @@ Thrive
 =====
 
 Thrive text-based Role Playing Game
+Try it out: http://davidmoritz.github.io/thrive/
 
 How to consume
 --------
