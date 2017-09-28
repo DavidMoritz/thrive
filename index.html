@@ -37,7 +37,7 @@
           </div>
           <div>
             <h3>Build</h3>
-            <button ng-repeat="structure in HF.structures" ng-click="build(structure)" ng-show="isUnlocked(structure.name)" class="btn btn-success structure"><i class="fa {{structure.icon}}"></i> {{structure.text}} <span class="badge">{{getStructurePrice(structure)}}</span></button>
+            <button ng-repeat="structure in HF.structures" ng-click="build(structure)" ng-show="isUnlocked(structure.name)" class="btn btn-success structure"><i class="fa {{structure.icon}}"></i> {{structure.text}} <span class="badge">{{getStructurePrice(structure)[0].amount}}</span></button>
           </div>
         </div>
         <div class="col-sm-6">
