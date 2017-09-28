@@ -338,6 +338,7 @@ thriveApp.controller('ThriveCtrl', [
 			location: null,
 			gameStarted: false,
 			readyToWork: true,
+			getStructurePrice: getStructurePrice,
 			HF: HF	//	now we can use it in the view
 		});
 		$s.display = _.cloneDeep($s.defaultDisplay);
