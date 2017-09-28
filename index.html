@@ -21,7 +21,7 @@
         <div ng-show="!display.next" class="choices">
           <ul>
             <li ng-repeat="choice in display.choices">
-              <button ng-click="makeChoice(choice)" ng-class="choice.css.join(&quot; &quot;)">{{choice.buttonText}}</button>
+              <button ng-click="makeChoice(choice)" ng-class="choice.css.join(&quot; &quot;)">{{choice.buttonText}} <span class="badge">7</span></button>
             </li>
           </ul>
         </div>
