@@ -41,7 +41,9 @@ html
 							ng-repeat='structure in HF.structures',
 							ng-click="build(structure)",
 							ng-show='isUnlocked(structure.name)'
-						) #[i(class="fa {{structure.icon}}")] {{structure.text}}
+						)
+							| #[i(class="fa {{structure.icon}}")] {{structure.text}}
+							span(ng-repeat='price in getStructurePrice(structure) | limitTo: 2')
 				.col-sm-6
 					h4 Workers
 					ul

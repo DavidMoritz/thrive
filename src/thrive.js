@@ -25,6 +25,7 @@ thriveApp.controller('ThriveCtrl', [
 			}) || null;	//	returns an object with parameters of 'resource' and 'quantity' (or null)
 		}
 
+<<<<<<< Updated upstream
 		function getStructurePrice(structure) {
 			var baseStructure = _.findWhere(HF.structures, {name: structure.name});
 			var currentPrice = _.cloneDeep(baseStructure.cost);
@@ -43,6 +44,8 @@ thriveApp.controller('ThriveCtrl', [
 			return currentPrice;
 		}
 
+=======
+>>>>>>> Stashed changes
 		var maxLots = 30;
 
 		//	initialize scoped variables
@@ -118,7 +121,7 @@ thriveApp.controller('ThriveCtrl', [
 			var available = true;
 			var purchase = [];
 
-			_.forEach(getStructurePrice(structure), function eachCostItem(costItem) {
+			_.forEach($s.getStructurePrice(structure), function eachCostItem(costItem) {
 				var supplyResource = getSupplyPaletteByResource(costItem);
 
 				if (supplyResource && supplyResource.quantity >= costItem.amount) {
@@ -151,6 +154,23 @@ thriveApp.controller('ThriveCtrl', [
 			} else {
 				$s.addMessage('You don\'t have enough room in your plot to build a ' + structure.name + '.');
 			}
+		};
+
+		$s.getStructurePrice = function getStructurePrice(structure) {
+			var baseStructure = _.findWhere(HF.structures, {name: structure.name});
+			var currentPrice = _.cloneDeep(baseStructure.cost);
+
+			var existingLot = getLotByStructure(structure);
+			if (existingLot) {
+				_.forEach(existingLot.structure.cost, function eachCostItem(costItem) {
+					//	TODO: refactor this with reduce
+					for (var i = 0; i < existingLot.quantity; i++) {
+						var currentPriceResource = _.findWhere(currentPrice, {name: costItem.name});
+						currentPriceResource.amount = Math.round(currentPriceResource.amount * (1 + baseStructure.priceIncrease));
+					}
+				});
+			}
+			return currentPrice;
 		};
 
 		$s.nextMessage = function nextMessage() {
